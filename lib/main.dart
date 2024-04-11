@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import './views/homepage/homepage.dart';
 import './views/intro/intro.dart';
@@ -10,7 +11,8 @@ import './views/hewanpeliharaan/hewanpeliharaan.dart';
 import './views/statistik/statistik.dart';
 import './views/logout/logout.dart';
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
