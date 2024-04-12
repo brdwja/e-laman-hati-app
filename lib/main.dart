@@ -11,10 +11,14 @@ import './views/hewanpeliharaan/hewanpeliharaan.dart';
 import './views/statistik/statistik.dart';
 import './views/logout/logout.dart';
 
+import './api/authentication.dart';
+
 Future main() async {
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
+
+
 
 /// The route configuration.
 final GoRouter _router = GoRouter(
@@ -34,13 +38,13 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'login',
           builder: (BuildContext context, GoRouterState state) {
-            return const Loginpage();
+            return Loginpage();
           },
         ),
         GoRoute(
           path: 'register',
           builder: (BuildContext context, GoRouterState state) {
-            return const Registerpage();
+            return Registerpage();
           },
         ),
         GoRoute(
@@ -69,7 +73,31 @@ final GoRouter _router = GoRouter(
         ),
         
       ],
+      redirect: (BuildContext context, GoRouterState state) async {
+            // Using `of` method creates a dependency of StreamAuthScope. It will
+            // cause go_router to reparse current route if StreamAuth has new sign-in
+            // information.
+            final bool loggedIn = await Authentication().isLoggedIn();
+            
+            final List<String> unauthenticatedRoutes = ['/intro', '/login', '/register'];
+            final bool loggingIn = unauthenticatedRoutes.contains(state.fullPath);
+            // debugPrint("IS LOGGEDIN? $loggedIn $loggingIn ${state.fullPath}");
+            if (!loggedIn) {
+              if (loggingIn) return null;
+              return '/intro';
+            }
+
+            // if the user is logged in but still on the login page, send them to
+            // the home page
+            if (loggingIn) {
+              return '/';
+            }
+
+            // no need to redirect at all
+            return null;
+          },
     ),
+  
   ],
 );
 
