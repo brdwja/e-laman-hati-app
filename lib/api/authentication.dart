@@ -2,6 +2,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:dio/dio.dart';
 
+import 'package:flutter/foundation.dart';
+
 class AuthenticationException implements Exception {
   final String msg;
   const AuthenticationException(this.msg);
@@ -60,9 +62,39 @@ class Authentication {
         },
       );
       var data = response.data as Map<String, dynamic>;
-      if (response.statusCode != 200 || data['status'] == 'false') {
-        return Future.error(AuthenticationException("Error ${response.statusCode}. Cek data anda dan coba lagi dalam beberapa saat"));
+      if (data['status'] == false) {
+        throw Exception();
       }
+    } on DioException catch (error) {
+      try {
+        if (error.response == null) throw Exception();
+        var data = error.response!.data as Map<String, dynamic>;
+        if (error.response!.statusCode == 500 && data['status'] == false) {
+          var errors = data['error'] as Map<String, dynamic>;
+          // debugPrint(errors.toString());
+          String errorString = errors.keys.map((String e) {
+            Map<String, String> errorMap = {
+              "email": 'Email',
+              "id_card_number": 'No KTP',
+              "phone_number": 'No HP'
+            };
+            return errorMap[e];
+          }).toList().where((element) => element != null).join(', ');
+          List<String> exceptionsStrings = [];
+          if (errorString.isNotEmpty) {
+            exceptionsStrings.add("$errorString sudah terdaftar!");
+          }
+          if (errors.keys.contains('password')) {
+            exceptionsStrings.add('Password minimal 8 karakter!');
+          }
+          String exceptionString = exceptionsStrings.join(" dan ");
+          return Future.error(AuthenticationException(exceptionString));
+        }
+        throw Exception();
+      } catch (err) {
+        throw const AuthenticationException("Terjadi kesalahan. Cek data anda dan coba lagi dalam beberapa saat");
+      }
+      
     } catch (error) {
       throw const AuthenticationException("Terjadi kesalahan. Cek data anda dan coba lagi dalam beberapa saat");
     }
@@ -74,7 +106,6 @@ class Authentication {
       try {
         await _storage.delete(key: 'BEARER_TOKEN');
       } catch (error) {
-        print(error.toString());
         return Future.error(const AuthenticationException("Terjadi kesalahan saat logout. Coba lagi dalam beberapa saat"));
       }
       try {
@@ -91,8 +122,8 @@ class Authentication {
           throw AuthenticationException("Error ${response.statusCode}. Cek data anda dan coba lagi dalam beberapa saat");
         }
       } catch (error) {
-        print('Api Failure');
-        print(error.toString());
+        debugPrint('Api Failure');
+        debugPrint(error.toString());
       }
     } else {
       throw const AuthenticationException('Not Logged in');

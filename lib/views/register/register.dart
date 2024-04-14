@@ -137,6 +137,50 @@ class _RegisterpageState extends State<Registerpage> {
                                 ),
                                 const SizedBox(height: 16,),
                                 TextFormField(
+                                  controller: _formEmailController,
+                                  decoration: InputDecoration(
+                                    errorStyle: TextStyle(
+                                      color: Colors.red.shade900,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    filled: true,
+                                    prefixIcon: Icon(Icons.email),
+                                    label: Text("Email"),
+                                    isDense: true
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Mohon diisi';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 16,),
+                                TextFormField(  
+                                  controller: _formPasswordController,
+                                  obscureText: true,
+                                  enableSuggestions: false,
+                                  autocorrect: false,
+                                  decoration: InputDecoration(
+                                    errorStyle: TextStyle(
+                                      color: Colors.red.shade900,
+                                      fontWeight: FontWeight.bold,
+                          
+                                    ),
+                                    filled: true,
+                                    prefixIcon: Icon(Icons.lock),
+                                    label: Text("Password"),
+                                    isDense: true
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Mohon diisi';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 16,),
+                                TextFormField(
                                   controller: _formPhoneController,
                                   decoration: InputDecoration(
                                     errorStyle: TextStyle(
@@ -185,7 +229,7 @@ class _RegisterpageState extends State<Registerpage> {
                                     ),
                                     filled: true,
                                     prefixIcon: Icon(Icons.home),
-                                    label: Text("Alamat"),
+                                    label: Text("Alamat (Jalan, No, RT/RW)"),
                                     isDense: true
                                   ),
                                   validator: (value) {
@@ -211,6 +255,7 @@ class _RegisterpageState extends State<Registerpage> {
                                           }
                                           
                                           return DropdownMenu<Kecamatan>(
+                                            width: 200,
                                             initialSelection: snapshot.data![0],
                                             controller: _kecamatanController,
                                             requestFocusOnTap: true,
@@ -225,7 +270,6 @@ class _RegisterpageState extends State<Registerpage> {
                                             dropdownMenuEntries: snapshot.data!.map((Kecamatan e) => DropdownMenuEntry<Kecamatan>(value: e, label: e.name)).toList(),
                                           );
                                         } else if (snapshot.hasError) {
-                                          debugPrint(snapshot.error.toString());
                                           return TextButton(onPressed: () => loadKecamatan(), child: const Text('Terjadi Kesalahan, tekan untuk coba lagi.'));
                                         }
                                         return const CircularProgressIndicator();
@@ -236,11 +280,13 @@ class _RegisterpageState extends State<Registerpage> {
                                       future: _daftarKelurahan,
                                       builder:(context, snapshot) {
                                         if (snapshot.hasData) {
-                                          if (snapshot.data!.length == 0) {
-                                            WidgetsBinding.instance
-                                              .addPostFrameCallback((_) => setState(() {
-                                              _selectedKelurahan = null;
-                                            }));
+                                          if (snapshot.data!.isEmpty) {
+                                            if (_selectedKelurahan != null) {
+                                              WidgetsBinding.instance
+                                                .addPostFrameCallback((_) => setState(() {
+                                                _selectedKelurahan = null;
+                                              }));
+                                            }
                                             return Text('Area Tidak Tersedia');
                                           }
                                           if (_selectedKelurahan == null) {
@@ -250,6 +296,7 @@ class _RegisterpageState extends State<Registerpage> {
                                             }));
                                           }
                                           return DropdownMenu<Kelurahan>(
+                                            width: 200,
                                             initialSelection: snapshot.data![0],
                                             controller: _kelurahanController,
                                             requestFocusOnTap: true,
@@ -263,7 +310,6 @@ class _RegisterpageState extends State<Registerpage> {
                                             dropdownMenuEntries: snapshot.data!.map((Kelurahan e) => DropdownMenuEntry<Kelurahan>(value: e, label: e.name)).toList(),
                                           );
                                         } else if (snapshot.hasError) {
-                                          debugPrint(snapshot.error.toString());
                                           WidgetsBinding.instance
                                               .addPostFrameCallback((_) => Future.delayed(Durations.extralong4, () => loadKelurahan(),));
                                         }
@@ -272,50 +318,6 @@ class _RegisterpageState extends State<Registerpage> {
                                     ),
 
                                   ],
-                                ),
-                                const SizedBox(height: 16,),
-                                TextFormField(
-                                  controller: _formEmailController,
-                                  decoration: InputDecoration(
-                                    errorStyle: TextStyle(
-                                      color: Colors.red.shade900,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    filled: true,
-                                    prefixIcon: Icon(Icons.email),
-                                    label: Text("Email"),
-                                    isDense: true
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mohon diisi';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 16,),
-                                TextFormField(  
-                                  controller: _formPasswordController,
-                                  obscureText: true,
-                                  enableSuggestions: false,
-                                  autocorrect: false,
-                                  decoration: InputDecoration(
-                                    errorStyle: TextStyle(
-                                      color: Colors.red.shade900,
-                                      fontWeight: FontWeight.bold,
-                          
-                                    ),
-                                    filled: true,
-                                    prefixIcon: Icon(Icons.lock),
-                                    label: Text("Password"),
-                                    isDense: true
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mohon diisi';
-                                    }
-                                    return null;
-                                  },
                                 ),
                                 const SizedBox(height: 16,),
                                 Row(children: [
@@ -352,8 +354,6 @@ class _RegisterpageState extends State<Registerpage> {
                                       }
                                         
                                       try {
-                                        debugPrint("Submitted Register!");
-                                        debugPrint("ids ${_selectedKecamatan!.id} ${_selectedKelurahan!.id}");
                                         await Authentication().register(
                                                 _formEmailController.text,
                                                 _formPasswordController.text,
