@@ -39,6 +39,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   flutter_dotenv: ^5.1.0
   dio: ^5.4.2+1
+  dio_smart_retry: ^6.0.0
 
 dev_dependencies:
   flutter_test:

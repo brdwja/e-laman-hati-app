@@ -12,10 +12,10 @@ class Logoutpage extends StatelessWidget {
       try {
         await Authentication().logout();
         if (!context.mounted) return;
-        context.go('/intro');
+        context.go('/login');
       } catch (error) {
         if (!context.mounted) return;
-        if (error.toString() == 'Not Logged in') context.go('/intro');
+        if (error.toString() == 'Not Logged in') context.go('/login');
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
         context.go('/');
       }

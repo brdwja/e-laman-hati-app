@@ -44,7 +44,7 @@ class Authentication {
     }
   }
 
-  Future<void> register(String email, String password, String name, String idCardNumber, String phoneNumber, String address) async {
+  Future<void> register(String email, String password, String name, String idCardNumber, String phoneNumber, String address, int kecamatanId, int kelurahanId) async {
     try {
       Response response = await _dio.post(
         "${dotenv.env['API_HOST']}/auth/create/user",
@@ -54,7 +54,9 @@ class Authentication {
           'name': name,
           'id_card_number': idCardNumber,
           'phone_number': phoneNumber,
-          'address': address
+          'address': address,
+          'district_id': kecamatanId,
+          'neighborhood_id': kelurahanId,
         },
       );
       var data = response.data as Map<String, dynamic>;
