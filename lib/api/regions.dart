@@ -19,7 +19,7 @@ class Regions {
     _dio.interceptors.add(RetryInterceptor(
       dio: _dio,
       logPrint: debugPrint,
-      retryableExtraStatuses: {status401Unauthorized},
+      retryableExtraStatuses: {status403Forbidden},
       retryDelays: const [
         Duration(seconds:1)
       ]
