@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/gestures.dart';
+import 'package:dropdown_textfield/dropdown_textfield.dart';
 
 import '../../api/authentication.dart';
 import '../../api/regions.dart';
@@ -18,6 +17,20 @@ class Registerpage extends StatefulWidget {
 class _RegisterpageState extends State<Registerpage> {
   final _formKey = GlobalKey<FormState>();
 
+  final InputDecoration formInputDecoration = const InputDecoration(
+    filled: true,
+    prefixIcon: Icon(Icons.egg),
+    label: Text("Input"),
+    isDense: true
+  );
+
+  String? inputFormValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Mohon diisi';
+    }
+    return null;
+  }
+
   final TextEditingController _formNameController = TextEditingController();
   final TextEditingController _formPhoneController = TextEditingController();
   final TextEditingController _formIdCardController = TextEditingController();
@@ -28,13 +41,25 @@ class _RegisterpageState extends State<Registerpage> {
   bool _formPrivacyPolicyState = false;
 
   Future<List<Kecamatan>>? _daftarKecamatan;
-  Future<List<Kelurahan>>? _daftarKelurahan;
-
-  final TextEditingController _kecamatanController = TextEditingController();
+  final SingleValueDropDownController _kecamatanFormController = SingleValueDropDownController();
   Kecamatan? _selectedKecamatan;
+  void _loadKecamatan() {
+    setState(() {
+      _daftarKecamatan = Regions().getActiveKecamatan();
+    });
+  }
 
-  final TextEditingController _kelurahanController = TextEditingController();
+  Future<List<Kelurahan>>? _daftarKelurahan;
+  final SingleValueDropDownController _kelurahanFormController = SingleValueDropDownController();
   Kelurahan? _selectedKelurahan;
+  void _loadKelurahan() {
+    setState(() {
+      if (_selectedKecamatan != null) {
+        _daftarKelurahan =
+            Regions().getKelurahanByKecamatanId(_selectedKecamatan!.id);
+      }
+    });
+  }
 
   void loadKecamatan() {
     setState(() {
@@ -118,42 +143,20 @@ class _RegisterpageState extends State<Registerpage> {
                               children: [
                                 TextFormField(
                                   controller: _formNameController,
-                                  decoration: InputDecoration(
-                                    errorStyle: TextStyle(
-                                      color: Colors.red.shade900,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    filled: true,
-                                    prefixIcon: Icon(Icons.person),
-                                    label: Text("Nama"),
-                                    isDense: true
+                                  decoration: formInputDecoration.copyWith(
+                                    prefixIcon: const Icon(Icons.person),
+                                    label: const Text('Nama'),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mohon diisi';
-                                    }
-                                    return null;
-                                  },
+                                  validator: inputFormValidator,
                                 ),
                                 const SizedBox(height: 16,),
                                 TextFormField(
                                   controller: _formEmailController,
-                                  decoration: InputDecoration(
-                                    errorStyle: TextStyle(
-                                      color: Colors.red.shade900,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    filled: true,
-                                    prefixIcon: Icon(Icons.email),
-                                    label: Text("Email"),
-                                    isDense: true
+                                  decoration: formInputDecoration.copyWith(
+                                    prefixIcon: const Icon(Icons.email),
+                                    label: const Text('Email'),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mohon diisi';
-                                    }
-                                    return null;
-                                  },
+                                  validator: inputFormValidator,
                                 ),
                                 const SizedBox(height: 16,),
                                 TextFormField(  
@@ -161,163 +164,124 @@ class _RegisterpageState extends State<Registerpage> {
                                   obscureText: true,
                                   enableSuggestions: false,
                                   autocorrect: false,
-                                  decoration: InputDecoration(
-                                    errorStyle: TextStyle(
-                                      color: Colors.red.shade900,
-                                      fontWeight: FontWeight.bold,
-                          
-                                    ),
-                                    filled: true,
-                                    prefixIcon: Icon(Icons.lock),
-                                    label: Text("Password"),
-                                    isDense: true
+                                  decoration: formInputDecoration.copyWith(
+                                    prefixIcon: const Icon(Icons.lock),
+                                    label: const Text('Password'),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mohon diisi';
-                                    }
-                                    return null;
-                                  },
+                                  validator: inputFormValidator,
                                 ),
                                 const SizedBox(height: 16,),
                                 TextFormField(
                                   controller: _formPhoneController,
-                                  decoration: InputDecoration(
-                                    errorStyle: TextStyle(
-                                      color: Colors.red.shade900,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    filled: true,
-                                    prefixIcon: Icon(Icons.phone),
-                                    label: Text("Nomor Telepon"),
-                                    isDense: true
+                                  decoration: formInputDecoration.copyWith(
+                                    prefixIcon: const Icon(Icons.phone),
+                                    label: const Text('Nomor Telepon'),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mohon diisi';
-                                    }
-                                    return null;
-                                  },
+                                  validator: inputFormValidator,
                                 ),
                                 const SizedBox(height: 16,),
                                 TextFormField(
                                   controller: _formIdCardController,
-                                  decoration: InputDecoration(
-                                    errorStyle: TextStyle(
-                                      color: Colors.red.shade900,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    filled: true,
-                                    prefixIcon: Icon(Icons.badge),
-                                    label: Text("No KTP"),
-                                    isDense: true
+                                  decoration: formInputDecoration.copyWith(
+                                    prefixIcon: const Icon(Icons.badge),
+                                    label: const Text('No KTP'),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mohon diisi';
-                                    }
-                                    return null;
-                                  },
+                                  validator: inputFormValidator,
                                 ),
                                 const SizedBox(height: 16,),
                                 TextFormField(
                                   controller: _formAddressController,
-                                  decoration: InputDecoration(
-                                    errorStyle: TextStyle(
-                                      color: Colors.red.shade900,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    filled: true,
-                                    prefixIcon: Icon(Icons.home),
-                                    label: Text("Alamat (Jalan, No, RT/RW)"),
-                                    isDense: true
+                                  decoration: formInputDecoration.copyWith(
+                                    prefixIcon: const Icon(Icons.home),
+                                    label: const Text('Alamat (Jalan, No, RT/RW)'),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mohon diisi';
-                                    }
-                                    return null;
-                                  },
+                                  validator: inputFormValidator,
                                 ),
                                 const SizedBox(height: 16,),
-                                Column(
-                                  children: [
-                                    FutureBuilder<List<Kecamatan>> (
-                                      future: _daftarKecamatan,
-                                      builder:(context, snapshot) {
-                                        if (snapshot.hasData) {
-                                          if (_selectedKecamatan == null) {
-                                            WidgetsBinding.instance
-                                              .addPostFrameCallback((_) => setState(() {
-                                              _selectedKecamatan = snapshot.data![0];
-                                              loadKelurahan();
-                                            }));
-                                          }
-                                          
-                                          return DropdownMenu<Kecamatan>(
-                                            width: 200,
-                                            initialSelection: snapshot.data![0],
-                                            controller: _kecamatanController,
-                                            requestFocusOnTap: true,
-                                            enableSearch: true,
-                                            label: const Text('Kecamatan'),
-                                            onSelected: (value) {
-                                              setState(() {
-                                                _selectedKecamatan = value;
-                                              });
-                                              loadKelurahan();
-                                            },
-                                            dropdownMenuEntries: snapshot.data!.map((Kecamatan e) => DropdownMenuEntry<Kecamatan>(value: e, label: e.name)).toList(),
-                                          );
-                                        } else if (snapshot.hasError) {
-                                          return TextButton(onPressed: () => loadKecamatan(), child: const Text('Terjadi Kesalahan, tekan untuk coba lagi.'));
-                                        }
-                                        return const CircularProgressIndicator();
-                                      },
-                                    ),
-                                    SizedBox(height: 16,),
-                                    _daftarKelurahan == null ? const SizedBox(height: 0,) : FutureBuilder<List<Kelurahan>> (
-                                      future: _daftarKelurahan,
-                                      builder:(context, snapshot) {
-                                        if (snapshot.hasData) {
-                                          if (snapshot.data!.isEmpty) {
-                                            if (_selectedKelurahan != null) {
-                                              WidgetsBinding.instance
-                                                .addPostFrameCallback((_) => setState(() {
-                                                _selectedKelurahan = null;
-                                              }));
+                                FutureBuilder<List<Kecamatan>>(
+                                  future: _daftarKecamatan,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return DropDownTextField(
+                                        controller: _kecamatanFormController,
+                                        textFieldDecoration: formInputDecoration.copyWith(
+                                          prefixIcon: const Icon(Icons.location_city),
+                                          label: const Text('Kecamatan'),
+                                        ),
+                                        searchAutofocus: true,
+                                        clearOption: true,
+                                        enableSearch: true,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            if (value is! DropDownValueModel) {
+                                              _selectedKecamatan = null;
+                                            } else {
+                                              _selectedKecamatan = value.value;
+                                              _loadKelurahan();
                                             }
-                                            return Text('Area Tidak Tersedia');
-                                          }
-                                          if (_selectedKelurahan == null) {
-                                            WidgetsBinding.instance
-                                              .addPostFrameCallback((_) => setState(() {
-                                              _selectedKelurahan = snapshot.data![0];
-                                            }));
-                                          }
-                                          return DropdownMenu<Kelurahan>(
-                                            width: 200,
-                                            initialSelection: snapshot.data![0],
-                                            controller: _kelurahanController,
-                                            requestFocusOnTap: true,
-                                            enableSearch: true,
-                                            label: const Text('Kelurahan'),
-                                            onSelected: (value) {
-                                              setState(() {
-                                                _selectedKelurahan = value;
-                                              });
-                                            },
-                                            dropdownMenuEntries: snapshot.data!.map((Kelurahan e) => DropdownMenuEntry<Kelurahan>(value: e, label: e.name)).toList(),
-                                          );
-                                        } else if (snapshot.hasError) {
+                                          });
+                                        },
+                                        validator: inputFormValidator,
+                                        dropDownItemCount: snapshot.data!.length,
+                                        dropDownList: snapshot.data!.map((Kecamatan e) => DropDownValueModel(value: e, name: e.name)).toList(),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return TextButton(
+                                          onPressed: () => _loadKecamatan(),
+                                          child: const Text(
+                                              'Terjadi Kesalahan, tekan untuk coba lagi.'));
+                                    }
+                                    return const CircularProgressIndicator();
+                                  },
+                                ),
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                                _daftarKelurahan == null ? const SizedBox(height: 0,) : 
+                                FutureBuilder<List<Kelurahan>>(
+                                  future: _daftarKelurahan,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      if (snapshot.data!.isEmpty) {
+                                        if (_selectedKelurahan != null) {
                                           WidgetsBinding.instance
-                                              .addPostFrameCallback((_) => Future.delayed(Durations.extralong4, () => loadKelurahan(),));
+                                              .addPostFrameCallback((_) => setState(() {
+                                                    _selectedKelurahan = null;
+                                                  }));
                                         }
-                                        return const CircularProgressIndicator();
-                                      },
-                                    ),
-
-                                  ],
+                                        return const Text('Area Tidak Tersedia');
+                                      }
+                                      return DropDownTextField(
+                                        controller: _kelurahanFormController,
+                                        textFieldDecoration: formInputDecoration.copyWith(
+                                          prefixIcon: const Icon(Icons.holiday_village),
+                                          label: const Text('Kelurahan'),
+                                        ),
+                                        searchAutofocus: true,
+                                        clearOption: true,
+                                        enableSearch: true,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            if (value is! DropDownValueModel) {
+                                              _selectedKelurahan = null;
+                                            } else {
+                                              _selectedKelurahan = value.value;
+                                            }
+                                          });
+                                        },
+                                        validator: inputFormValidator,
+                                        dropDownItemCount: snapshot.data!.length,
+                                        dropDownList: snapshot.data!.map((Kelurahan e) => DropDownValueModel(value: e, name: e.name)).toList(),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) => Future.delayed(
+                                                Durations.extralong4,
+                                                () => _loadKelurahan(),
+                                              ));
+                                    }
+                                    return const CircularProgressIndicator();
+                                  },
                                 ),
                                 const SizedBox(height: 16,),
                                 Row(children: [

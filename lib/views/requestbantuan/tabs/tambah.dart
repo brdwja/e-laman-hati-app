@@ -1,7 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dropdown_textfield/dropdown_textfield.dart';
 
 
 import '../../../api/animals.dart';
@@ -27,8 +30,27 @@ class _TambahBantuanState extends State<TambahBantuan> {
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _imageFile;
 
+  final InputDecoration formInputDecoration = InputDecoration(
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+    prefixIcon: const Icon(Icons.egg),
+    label: const Text("Input"),
+    isDense: true,
+    
+  );
+
+  String? inputFormValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Mohon diisi';
+    }
+    return null;
+  }
+
   Future<List<AnimalType>>? _daftarHewan;
-  final TextEditingController _hewanController = TextEditingController();
+  final SingleValueDropDownController __hewanFormController = SingleValueDropDownController();
   AnimalType? _selectedHewan;
   void _loadHewan() {
     setState(() {
@@ -37,7 +59,7 @@ class _TambahBantuanState extends State<TambahBantuan> {
   }
 
   Future<List<Kecamatan>>? _daftarKecamatan;
-  final TextEditingController _kecamatanController = TextEditingController();
+  final SingleValueDropDownController _kecamatanFormController = SingleValueDropDownController();
   Kecamatan? _selectedKecamatan;
   void _loadKecamatan() {
     setState(() {
@@ -46,7 +68,7 @@ class _TambahBantuanState extends State<TambahBantuan> {
   }
 
   Future<List<Kelurahan>>? _daftarKelurahan;
-  final TextEditingController _kelurahanController = TextEditingController();
+  final SingleValueDropDownController _kelurahanFormController = SingleValueDropDownController();
   Kelurahan? _selectedKelurahan;
   void _loadKelurahan() {
     setState(() {
@@ -76,20 +98,11 @@ class _TambahBantuanState extends State<TambahBantuan> {
               children: [
                 TextFormField(
                   controller: _formGejalaController,
-                  decoration: InputDecoration(
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(32),
-                      ),
-                      prefixIcon: const Icon(Icons.sick),
-                      label: const Text("Gejala"),
-                      isDense: true),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Mohon diisi';
-                    }
-                    return null;
-                  },
+                  decoration: formInputDecoration.copyWith(
+                    prefixIcon: const Icon(Icons.sick),
+                    label: const Text('Gejala'),
+                  ),
+                  validator: inputFormValidator,
                   maxLines: null, // Allow multiline input
                   keyboardType:
                       TextInputType.multiline, // Enable multiline keyboard
@@ -103,34 +116,28 @@ class _TambahBantuanState extends State<TambahBantuan> {
                   future: _daftarHewan,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      // if (_selectedHewan == null) {
-                      //   WidgetsBinding.instance
-                      //       .addPostFrameCallback((_) => setState(() {
-                      //             _selectedHewan = snapshot.data![0];
-                      //           }));
-                      // }
-                      return DropdownMenu<AnimalType>(
-                        width: 250,
-                        inputDecorationTheme: InputDecorationTheme(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(32)),
-                          isDense: true,
+                      return DropDownTextField(
+                        controller: __hewanFormController,
+                        textFieldDecoration: formInputDecoration.copyWith(
+                          prefixIcon: const Icon(Icons.pets),
+                          label: const Text('Jenis Hewan'),
                         ),
-                        // initialSelection: snapshot.data![0],
-                        controller: _hewanController,
-                        requestFocusOnTap: true,
+                        searchAutofocus: true,
+                        clearOption: true,
                         enableSearch: true,
-                        label: const Text('Jenis Hewan'),
-                        onSelected: (value) {
+                        onChanged: (value) {
                           setState(() {
-                            _selectedHewan = value;
+                            if (value is! DropDownValueModel) {
+                              _selectedHewan = null;
+                            } else {
+                              _selectedHewan = value.value;
+                            }
                           });
                         },
-                        dropdownMenuEntries: snapshot.data!
-                            .map((AnimalType e) =>
-                                DropdownMenuEntry<AnimalType>(
-                                    value: e, label: e.name))
-                            .toList(),
+                        validator: inputFormValidator,
+                        dropDownItemCount: snapshot.data!.length,
+                        dropDownList: snapshot.data!
+                            .map((AnimalType e) => DropDownValueModel(value: e, name: e.name)).toList(),
                       );
                     } else if (snapshot.hasError) {
                       return TextButton(
@@ -146,20 +153,11 @@ class _TambahBantuanState extends State<TambahBantuan> {
                 ),
                 TextFormField(
                   controller: _formAlamatController,
-                  decoration: InputDecoration(
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(32),
-                      ),
-                      prefixIcon: const Icon(Icons.home),
-                      label: const Text("Alamat"),
-                      isDense: true),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Mohon diisi';
-                    }
-                    return null;
-                  },
+                  decoration: formInputDecoration.copyWith(
+                          prefixIcon: const Icon(Icons.home),
+                          label: const Text('Alamat'),
+                        ),
+                  validator: inputFormValidator,
                 ),
                 const SizedBox(
                   height: 16,
@@ -168,36 +166,28 @@ class _TambahBantuanState extends State<TambahBantuan> {
                   future: _daftarKecamatan,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      // if (_selectedKecamatan == null) {
-                      //   WidgetsBinding.instance
-                      //       .addPostFrameCallback((_) => setState(() {
-                      //             _selectedKecamatan = snapshot.data![0];
-                      //             _loadKelurahan();
-                      //           }));
-                      // }
-
-                      return DropdownMenu<Kecamatan>(
-                        width: 250,
-                        inputDecorationTheme: InputDecorationTheme(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(32)),
-                          isDense: true,
+                      return DropDownTextField(
+                        controller: _kecamatanFormController,
+                        textFieldDecoration: formInputDecoration.copyWith(
+                          prefixIcon: const Icon(Icons.location_city),
+                          label: const Text('Kecamatan'),
                         ),
-                        // initialSelection: snapshot.data![0],
-                        controller: _kecamatanController,
-                        requestFocusOnTap: true,
+                        searchAutofocus: true,
+                        clearOption: true,
                         enableSearch: true,
-                        label: const Text('Kecamatan'),
-                        onSelected: (value) {
+                        onChanged: (value) {
                           setState(() {
-                            _selectedKecamatan = value;
+                            if (value is! DropDownValueModel) {
+                              _selectedKecamatan = null;
+                            } else {
+                              _selectedKecamatan = value.value;
+                              _loadKelurahan();
+                            }
                           });
-                          _loadKelurahan();
                         },
-                        dropdownMenuEntries: snapshot.data!
-                            .map((Kecamatan e) => DropdownMenuEntry<Kecamatan>(
-                                value: e, label: e.name))
-                            .toList(),
+                        validator: inputFormValidator,
+                        dropDownItemCount: snapshot.data!.length,
+                        dropDownList: snapshot.data!.map((Kecamatan e) => DropDownValueModel(value: e, name: e.name)).toList(),
                       );
                     } else if (snapshot.hasError) {
                       return TextButton(
@@ -211,62 +201,52 @@ class _TambahBantuanState extends State<TambahBantuan> {
                 const SizedBox(
                   height: 16,
                 ),
-                _daftarKelurahan == null
-                    ? const SizedBox(
-                        height: 0,
-                      )
-                    : FutureBuilder<List<Kelurahan>>(
-                        future: _daftarKelurahan,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            if (snapshot.data!.isEmpty) {
-                              if (_selectedKelurahan != null) {
-                                WidgetsBinding.instance
-                                    .addPostFrameCallback((_) => setState(() {
-                                          _selectedKelurahan = null;
-                                        }));
-                              }
-                              return const Text('Area Tidak Tersedia');
+                _daftarKelurahan == null ? const SizedBox(height: 0,) : 
+                FutureBuilder<List<Kelurahan>>(
+                  future: _daftarKelurahan,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data!.isEmpty) {
+                        if (_selectedKelurahan != null) {
+                          WidgetsBinding.instance
+                              .addPostFrameCallback((_) => setState(() {
+                                    _selectedKelurahan = null;
+                                  }));
+                        }
+                        return const Text('Area Tidak Tersedia');
+                      }
+                      return DropDownTextField(
+                        controller: _kelurahanFormController,
+                        textFieldDecoration: formInputDecoration.copyWith(
+                          prefixIcon: const Icon(Icons.holiday_village),
+                          label: const Text('Kelurahan'),
+                        ),
+                        searchAutofocus: true,
+                        clearOption: true,
+                        enableSearch: true,
+                        onChanged: (value) {
+                          setState(() {
+                            if (value is! DropDownValueModel) {
+                              _selectedKelurahan = null;
+                            } else {
+                              _selectedKelurahan = value.value;
                             }
-                            // if (_selectedKelurahan == null) {
-                            //   WidgetsBinding.instance
-                            //       .addPostFrameCallback((_) => setState(() {
-                            //             _selectedKelurahan = snapshot.data![0];
-                            //           }));
-                            // }
-                            return DropdownMenu<Kelurahan>(
-                              width: 250,
-                              inputDecorationTheme: InputDecorationTheme(
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(32)),
-                                isDense: true,
-                              ),
-                              // initialSelection: snapshot.data![0],
-                              controller: _kelurahanController,
-                              requestFocusOnTap: true,
-                              enableSearch: true,
-                              label: const Text('Kelurahan'),
-                              onSelected: (value) {
-                                setState(() {
-                                  _selectedKelurahan = value;
-                                });
-                              },
-                              dropdownMenuEntries: snapshot.data!
-                                  .map((Kelurahan e) =>
-                                      DropdownMenuEntry<Kelurahan>(
-                                          value: e, label: e.name))
-                                  .toList(),
-                            );
-                          } else if (snapshot.hasError) {
-                            WidgetsBinding.instance
-                                .addPostFrameCallback((_) => Future.delayed(
-                                      Durations.extralong4,
-                                      () => _loadKelurahan(),
-                                    ));
-                          }
-                          return const CircularProgressIndicator();
+                          });
                         },
-                      ),
+                        validator: inputFormValidator,
+                        dropDownItemCount: snapshot.data!.length,
+                        dropDownList: snapshot.data!.map((Kelurahan e) => DropDownValueModel(value: e, name: e.name)).toList(),
+                      );
+                    } else if (snapshot.hasError) {
+                      WidgetsBinding.instance
+                          .addPostFrameCallback((_) => Future.delayed(
+                                Durations.extralong4,
+                                () => _loadKelurahan(),
+                              ));
+                    }
+                    return const CircularProgressIndicator();
+                  },
+                ),
                 const Divider(
                   height: 32,
                 ),
@@ -310,6 +290,9 @@ class _TambahBantuanState extends State<TambahBantuan> {
                     });
                   },
                   icon: const Icon(Icons.camera),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+                  ),
                   label: _imageFile == null
                       ? const Text('Tambahkan Gambar')
                       : const Text("Ubah Gambar"),
@@ -330,6 +313,13 @@ class _TambahBantuanState extends State<TambahBantuan> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
+                    // debugPrint(_selectedHewan.toString());
+                    // debugPrint(_selectedHewan?.name);
+                    // debugPrint(_selectedKecamatan.toString());
+                    // debugPrint(_selectedKecamatan?.name);
+                    // debugPrint(_selectedKelurahan.toString());
+                    // debugPrint(_selectedKelurahan?.name);
+                    // return;
                     if (_formKey.currentState!.validate()) {
                       if (_selectedHewan == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -385,8 +375,10 @@ class _TambahBantuanState extends State<TambahBantuan> {
                       }
                     }
                   },
-                  style: const ButtonStyle(
-                    elevation: MaterialStatePropertyAll(4),
+
+                  style: ElevatedButton.styleFrom(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
                   ),
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
