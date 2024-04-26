@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 
@@ -50,7 +48,7 @@ class _TambahBantuanState extends State<TambahBantuan> {
   }
 
   Future<List<AnimalType>>? _daftarHewan;
-  final SingleValueDropDownController __hewanFormController = SingleValueDropDownController();
+  final SingleValueDropDownController _hewanFormController = SingleValueDropDownController();
   AnimalType? _selectedHewan;
   void _loadHewan() {
     setState(() {
@@ -117,7 +115,7 @@ class _TambahBantuanState extends State<TambahBantuan> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return DropDownTextField(
-                        controller: __hewanFormController,
+                        controller: _hewanFormController,
                         textFieldDecoration: formInputDecoration.copyWith(
                           prefixIcon: const Icon(Icons.pets),
                           label: const Text('Jenis Hewan'),
@@ -143,7 +141,9 @@ class _TambahBantuanState extends State<TambahBantuan> {
                       return TextButton(
                           onPressed: () => _loadHewan(),
                           child: const Text(
-                              'Terjadi Kesalahan, tekan untuk coba lagi.'));
+                              'Terjadi Kesalahan, tekan untuk coba lagi.',
+                            ),
+                      );
                     }
                     return const CircularProgressIndicator();
                   },
@@ -193,7 +193,9 @@ class _TambahBantuanState extends State<TambahBantuan> {
                       return TextButton(
                           onPressed: () => _loadKecamatan(),
                           child: const Text(
-                              'Terjadi Kesalahan, tekan untuk coba lagi.'));
+                              'Terjadi Kesalahan, tekan untuk coba lagi.',
+                            ),
+                          );
                     }
                     return const CircularProgressIndicator();
                   },
@@ -365,7 +367,10 @@ class _TambahBantuanState extends State<TambahBantuan> {
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil mengajukan bantuan!")));
                         _formAlamatController.text = '';
                         _formGejalaController.text = '';
-                        DefaultTabController.of(context).animateTo(1);
+                        _hewanFormController.clearDropDown();
+                        _kecamatanFormController.clearDropDown();
+                        _kelurahanFormController.clearDropDown();
+                        DefaultTabController.of(context).animateTo(0);
                         setState(() {
                           _imageFile = null;
                         });
@@ -375,7 +380,6 @@ class _TambahBantuanState extends State<TambahBantuan> {
                       }
                     }
                   },
-
                   style: ElevatedButton.styleFrom(
                     elevation: 4,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))

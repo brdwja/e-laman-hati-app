@@ -27,20 +27,20 @@ class RequestBantuan extends StatelessWidget {
           bottom: const TabBar(
             tabs: [
               Tab(
-                icon: Icon(Icons.diamond),
-                child: Text('Tambah'),
-              ),
-              Tab(
                 icon: Icon(Icons.history),
                 child: Text('Riwayat'),
+              ),
+              Tab(
+                icon: Icon(Icons.diamond),
+                child: Text('Tambah'),
               ),
             ],
           ),
         ),
         body: const TabBarView(
             children: <Widget>[
-              TambahBantuan(),
               RiwayatBantuan(),
+              TambahBantuan(),
             ],
           ),
         endDrawer: const NavDrawer(),

@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -19,10 +17,18 @@ class RiwayatBantuan extends StatefulWidget {
 class _RiwayatBantuanState extends State<RiwayatBantuan> {
   Future<List<AnimalReport>>? _futureReport;
 
-  void _loadReports() {
+  Future<void> _loadReports() async
+  {
+    var report = ReportAnimal().getList();
     setState(() {
-      _futureReport = ReportAnimal().getList();
+      _futureReport = report;
     });
+    try {
+      await report;
+    } catch (error){
+      //
+    }
+    
   }
 
   @override
@@ -35,10 +41,7 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        _futureReport == null
-            ? const SizedBox(
-                height: 0,
-              )
+        _futureReport == null ? const SizedBox(height: 0,)
             : Center(
                 child: FutureBuilder<List<AnimalReport>>(
                   future: _futureReport,
@@ -48,83 +51,79 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
                         return const Center(child: Text('Riwayat Kosong'));
                       }
                       debugPrint(snapshot.data?[0].toString());
-                      return ListView.separated(
-                          padding: const EdgeInsets.only(bottom: 96),
-                          itemCount: snapshot.data!.length,
-                          separatorBuilder: (context, index) => const Divider(),
-                          itemBuilder: (context, index) => Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: GestureDetector(
-                                  onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => RiwayatView(
-                                            report: snapshot.data![index]),
-                                      )),
-                                  child: Stack(
-                                    children: [
-                                        Card.outlined(
-                                        clipBehavior: Clip.hardEdge,
-                                        child: Row(
-                                          children: [
-                                            Image.network(
-                                              "${dotenv.env['STORAGE_HOST']}/${snapshot.data![index].photo}",
-                                              width: 150,
-                                              height: 180,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error,
-                                                      stackTrace) =>
-                                                  const SizedBox(
-                                                      width: 150,
-                                                      height: 180,
-                                                      child: Center(
-                                                          child:
-                                                              Icon(Icons.error))),
+                      return RefreshIndicator(
+                        onRefresh: () async {
+                          await _loadReports();
+                        },
+                        child: ListView.separated(
+                            padding: const EdgeInsets.only(bottom: 96),
+                            itemCount: snapshot.data!.length,
+                            separatorBuilder: (context, index) => const Divider(),
+                            itemBuilder: (context, index) => Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                    onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => RiwayatView(
+                                              report: snapshot.data![index],
                                             ),
-                                            Expanded(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        const Icon(
-                                                            Icons.pin_drop),
-                                                        Expanded(
-                                                          child: Text(
-                                                            "${snapshot.data![index].kelurahan.name}, ${snapshot.data![index].kecamatan.name}",
-                                                          ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                      snapshot.data![index]
-                                                          .jenisHewan.name,
-                                                      style: const TextStyle(
-                                                          fontSize: 32),
-                                                    ),
-                                                    Text(
-                                                      DateFormat('dd-MM-yyyy')
-                                                          .format(snapshot
-                                                              .data![index]
-                                                              .timestamp),
-                                                      style: const TextStyle(
-                                                        fontSize: 12,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            )
-                                          ],
                                         ),
                                       ),
-                                      Positioned(
+                                    child: Stack(
+                                      children: [
+                                          Card.outlined(
+                                          clipBehavior: Clip.hardEdge,
+                                          child: Row(
+                                            children: [
+                                              Image.network(
+                                                "${dotenv.env['STORAGE_HOST']}/${snapshot.data![index].photo}",
+                                                width: 150,
+                                                height: 180,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error, stackTrace) =>
+                                                  const SizedBox(
+                                                    width: 150,
+                                                    height: 180,
+                                                    child: Center(
+                                                      child: Icon(Icons.error),
+                                                    ),
+                                                  ),
+                                              ),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          const Icon(
+                                                              Icons.pin_drop),
+                                                          Expanded(
+                                                            child: Text(
+                                                              "${snapshot.data![index].kelurahan.name}, ${snapshot.data![index].kecamatan.name}",
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Text(
+                                                        snapshot.data![index]
+                                                            .jenisHewan.name,
+                                                        style: const TextStyle(
+                                                            fontSize: 32),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        Positioned(
                                           top: 8,
                                           right: 8,
                                           child: IconButton(
@@ -140,14 +139,30 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
                                               icon: const Icon(Icons.delete),
                                           ),
                                         ),
-                                    ],
+                                        Positioned(
+                                          bottom: 12,
+                                          right: 16,
+                                          child: Text(
+                                            DateFormat('dd-MM-yyyy')
+                                                .format(snapshot
+                                                    .data![index]
+                                                    .timestamp),
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ));
+                                )),
+                      );
                     } else if (snapshot.hasError) {
                       return TextButton(
                           onPressed: () => _loadReports(),
-                          child: const Text('Terjadi Kesalahan, tekan untuk coba lagi.'));
+                          child: const Text('Terjadi Kesalahan, tekan untuk coba lagi.'),
+                        );
                     }
                     return const CircularProgressIndicator();
                   },
@@ -156,8 +171,11 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
               Positioned(
                 bottom: 20,
                 right: 20,
-                child: FloatingActionButton(onPressed: () => launchUrlString("https://wa.me/66621649270?text=Halo%20DKPP%2C%20saya%20masyarakat%20bandung%20ingin%20meminta%20bantuan%20berikut.%0ANama%3A%0AAlamat%3A"), child: const Icon(Icons.chat),),
-              )
+                child: FloatingActionButton(
+                  onPressed: () => launchUrlString("https://wa.me/66621649270?text=Halo%20DKPP%2C%20saya%20masyarakat%20bandung%20ingin%20meminta%20bantuan%20berikut.%0ANama%3A%0AAlamat%3A"),
+                  child: const Icon(Icons.chat),
+                ),
+              ),
       ],
     );
   }
