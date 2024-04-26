@@ -40,12 +40,6 @@ class NavDrawer extends StatelessWidget {
       selectedIcon: Icon(Icons.pets, color: Color(0xff172b4d)),
       route: '/hewanpeliharaan'
     ),
-    _NavigationDestination(
-      label: 'Statistik',
-      icon: Icon(Icons.pie_chart_outline, color: Color(0xff172b4d)),
-      selectedIcon: Icon(Icons.pie_chart, color: Color(0xff172b4d)),
-      route: '/statistik'
-    ),
     _NavigationDestination.separator,
     _NavigationDestination(
       label: 'Keluar',

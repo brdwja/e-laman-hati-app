@@ -119,7 +119,7 @@ class _RegisterpageState extends State<Registerpage> {
               Positioned(
                 bottom: 16,
                 right: 16,
-                child: Image.asset('assets/images/dkpp-putih.png'),
+                child: Image.asset('assets/images/dkpp-putih.png', height: 40,),
               ),
               SingleChildScrollView(
                 child: Column(

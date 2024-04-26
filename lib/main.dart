@@ -8,7 +8,6 @@ import './views/login/login.dart';
 import './views/register/register.dart';
 import './views/requestbantuan/requestbantuan.dart';
 import './views/hewanpeliharaan/hewanpeliharaan.dart';
-import './views/statistik/statistik.dart';
 import './views/logout/logout.dart';
 
 import './api/authentication.dart';
@@ -57,12 +56,6 @@ final GoRouter _router = GoRouter(
           path: 'hewanpeliharaan',
           builder: (BuildContext context, GoRouterState state) {
             return const HewanPeliharaan();
-          },
-        ),
-        GoRoute(
-          path: 'statistik',
-          builder: (BuildContext context, GoRouterState state) {
-            return const Statistikpage();
           },
         ),
         GoRoute(
