@@ -46,7 +46,7 @@ class Intropage extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 128),
-                  child: Image.asset('assets/images/lamanhati-putih.png'),
+                  child: Image.asset('assets/images/lamanhati-putih.png', width: 250,),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 64),

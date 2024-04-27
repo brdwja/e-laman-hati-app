@@ -126,7 +126,7 @@ class _RegisterpageState extends State<Registerpage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Image.asset('assets/images/lamanhati-putih.png'),
+                      child: Image.asset('assets/images/lamanhati-putih.png', width: 250,),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
