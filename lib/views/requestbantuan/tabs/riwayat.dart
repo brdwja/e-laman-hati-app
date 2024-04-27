@@ -50,7 +50,6 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
                       if (snapshot.data!.isEmpty) {
                         return const Center(child: Text('Riwayat Kosong'));
                       }
-                      debugPrint(snapshot.data?[0].toString());
                       return RefreshIndicator(
                         onRefresh: () async {
                           await _loadReports();
@@ -62,14 +61,14 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
                             itemBuilder: (context, index) => Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: GestureDetector(
-                                    onTap: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => RiwayatView(
-                                              report: snapshot.data![index],
-                                            ),
-                                        ),
-                                      ),
+                                    onTap: () => showModalBottomSheet<void>(
+                                      isScrollControlled: true,
+                                      context: context,
+                                      showDragHandle: true,
+                                      builder: (context) {
+                                        return RiwayatModalContents(report: snapshot.data![index],);
+                                      },
+                                    ),
                                     child: Stack(
                                       children: [
                                           Card.outlined(
@@ -181,73 +180,71 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
   }
 }
 
-class RiwayatView extends StatelessWidget {
-  const RiwayatView({required this.report, super.key});
+class RiwayatModalContents extends StatelessWidget {
+  const RiwayatModalContents({required this.report, super.key});
   final AnimalReport report;
+
+  Widget buildItem(IconData icon, String name, String content) {
+    return DefaultTextStyle.merge(
+      style: const TextStyle(color: Color(0xff172b4d)),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 32, color: Color(0xff172b4d),),
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name),
+                  Text(content, style: const TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.clip,)
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
+    return SingleChildScrollView(
         child: Center(
-          child: Column(
-            children: [
-              Image.network(
-                "${dotenv.env['STORAGE_HOST']}/${report.photo}",
-                height: 200,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const SizedBox(
-                    height: 200, child: Center(child: Icon(Icons.error))),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.pin_drop),
-                        Flexible(child: Text("${report.kelurahan.name}, ${report.kecamatan.name}"))
-                      ],
-                    ),
-                    Text(
-                      report.jenisHewan.name,
-                      style: const TextStyle(fontSize: 32),
-                    ),
-                    Text(
-                      DateFormat('dd-MM-yyyy').format(report.timestamp),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: Image.network(
+                      "${dotenv.env['STORAGE_HOST']}/${report.photo}",
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const SizedBox(
+                      height: 200, child: Center(child: Icon(Icons.error)),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      'Alamat:',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    Text(report.address),
-                    SizedBox(height: 8,),
-                    const Text(
-                      'Gejala:',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    Text(report.symptom),
-                  ],
-                ),
-              )
-            ],
+                const SizedBox(height: 16,),
+                buildItem(Icons.pets, 'Jenis', report.jenisHewan.name),
+                const SizedBox(height: 8,),
+                buildItem(Icons.sick, 'Gejala', report.symptom),
+                const SizedBox(height: 8,),
+                buildItem(Icons.place, 'Lokasi', "${report.kelurahan.name}, ${report.kecamatan.name}"),
+                const SizedBox(height: 8,),
+                buildItem(Icons.home, 'Alamat Lengkap', report.address),
+                const SizedBox(height: 8,),
+                buildItem(Icons.sick, 'Waktu Aduan', DateFormat('HH:MM dd-MM-yyyy').format(report.timestamp)),
+                const SizedBox(height: 32,),
+              ],
+            ),
           ),
         ),
-      ),
     );
   }
 }
