@@ -22,6 +22,8 @@ class TambahBantuan extends StatefulWidget {
 class _TambahBantuanState extends State<TambahBantuan> {
   final _formKey = GlobalKey<FormState>();
 
+  var submitDisabled = false;
+
   final TextEditingController _formGejalaController = TextEditingController();
   final TextEditingController _formAlamatController = TextEditingController();
 
@@ -314,7 +316,7 @@ class _TambahBantuanState extends State<TambahBantuan> {
                   height: 16,
                 ),
                 ElevatedButton(
-                  onPressed: () async {
+                  onPressed: submitDisabled ? null : () async {
                     // debugPrint(_selectedHewan.toString());
                     // debugPrint(_selectedHewan?.name);
                     // debugPrint(_selectedKecamatan.toString());
@@ -356,6 +358,9 @@ class _TambahBantuanState extends State<TambahBantuan> {
                       debugPrint(
                           "${_formGejalaController.text} ${_selectedHewan?.name} ${_formAlamatController.text} ${_selectedKecamatan?.name} ${_selectedKelurahan?.name} ${_imageFile?.path}");
                       try {
+                        setState(() {
+                          submitDisabled = true;
+                        });
                         await ReportAnimal().create(
                             _formAlamatController.text,
                             _selectedKecamatan!.id,
@@ -370,6 +375,12 @@ class _TambahBantuanState extends State<TambahBantuan> {
                         _hewanFormController.clearDropDown();
                         _kecamatanFormController.clearDropDown();
                         _kelurahanFormController.clearDropDown();
+                        setState(() {
+                          _selectedHewan = null;
+                          _selectedKecamatan = null;
+                          _selectedKelurahan = null;
+                          _daftarKelurahan = null;
+                        });
                         DefaultTabController.of(context).animateTo(0);
                         setState(() {
                           _imageFile = null;
@@ -377,6 +388,10 @@ class _TambahBantuanState extends State<TambahBantuan> {
                       } catch (error) {
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text(error.toString())));
+                      } finally {
+                        setState(() {
+                          submitDisabled = false;
+                        });
                       }
                     }
                   },

@@ -21,6 +21,7 @@ class ReportAnimal {
       dio: _dio,
       logPrint: debugPrint,
       retryableExtraStatuses: {status403Forbidden},
+      retries: 3,
       retryDelays: const [
         Duration(seconds:1)
       ]
