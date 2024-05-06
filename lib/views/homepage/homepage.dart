@@ -110,8 +110,26 @@ class Homepage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('Total Kucing Tercatat', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xff32325d))),
-                          const Text('Steril: 40/1000', style: TextStyle(fontSize: 16, color: Color(0xff32325d))),
-                          const Text('Vaksin: 20/1000', style: TextStyle(fontSize: 16, color: Color(0xff32325d))),
+                          RichText(
+                            text: const TextSpan(
+                              style: TextStyle(fontSize: 16, color: Color(0xff32325d)),
+                              children: [
+                                TextSpan(text: "Steril: "),
+                                TextSpan(text: "40", style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: "/1000"),
+                              ]
+                            ),
+                          ),
+                          RichText(
+                            text: const TextSpan(
+                              style: TextStyle(fontSize: 16, color: Color(0xff32325d)),
+                              children: [
+                                TextSpan(text: "Vaksin: "),
+                                TextSpan(text: "20", style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: "/1000"),
+                              ]
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -143,8 +161,26 @@ class Homepage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('Total Anjing Tercatat', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xff32325d))),
-                          const Text('Steril: 40/1000', style: TextStyle(fontSize: 16, color: Color(0xff32325d))),
-                          const Text('Vaksin: 20/1000', style: TextStyle(fontSize: 16, color: Color(0xff32325d))),
+                          RichText(
+                            text: const TextSpan(
+                              style: TextStyle(fontSize: 16, color: Color(0xff32325d)),
+                              children: [
+                                TextSpan(text: "Steril: "),
+                                TextSpan(text: "40", style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: "/1000"),
+                              ]
+                            ),
+                          ),
+                          RichText(
+                            text: const TextSpan(
+                              style: TextStyle(fontSize: 16, color: Color(0xff32325d)),
+                              children: [
+                                TextSpan(text: "Vaksin: "),
+                                TextSpan(text: "20", style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: "/1000"),
+                              ]
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -176,8 +212,26 @@ class Homepage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('Total Hewan Lainnya Tercatat', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xff32325d))),
-                          const Text('Steril: 40/1000', style: TextStyle(fontSize: 16, color: Color(0xff32325d))),
-                          const Text('Vaksin: 20/1000', style: TextStyle(fontSize: 16, color: Color(0xff32325d))),
+                          RichText(
+                            text: const TextSpan(
+                              style: TextStyle(fontSize: 16, color: Color(0xff32325d)),
+                              children: [
+                                TextSpan(text: "Steril: "),
+                                TextSpan(text: "40", style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: "/1000"),
+                              ]
+                            ),
+                          ),
+                          RichText(
+                            text: const TextSpan(
+                              style: TextStyle(fontSize: 16, color: Color(0xff32325d)),
+                              children: [
+                                TextSpan(text: "Vaksin: "),
+                                TextSpan(text: "20", style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: "/1000"),
+                              ]
+                            ),
+                          ),
                         ],
                       ),
                     ),

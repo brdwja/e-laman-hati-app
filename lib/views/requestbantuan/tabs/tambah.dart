@@ -33,9 +33,8 @@ class _TambahBantuanState extends State<TambahBantuan> {
   final InputDecoration formInputDecoration = InputDecoration(
     filled: true,
     fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
+    border: InputBorder.none,
+    
     prefixIcon: const Icon(Icons.egg),
     label: const Text("Input"),
     isDense: true,
@@ -96,18 +95,21 @@ class _TambahBantuanState extends State<TambahBantuan> {
           child: Center(
             child: Column(
               children: [
-                TextFormField(
-                  controller: _formGejalaController,
-                  decoration: formInputDecoration.copyWith(
-                    prefixIcon: const Icon(Icons.sick),
-                    label: const Text('Gejala'),
+                Material(
+                  elevation: 2,
+                  child: TextFormField(
+                    controller: _formGejalaController,
+                    decoration: formInputDecoration.copyWith(
+                      prefixIcon: const Icon(Icons.sick),
+                      label: const Text('Gejala'),
+                    ),
+                    validator: inputFormValidator,
+                    maxLines: null, // Allow multiline input
+                    keyboardType:
+                        TextInputType.multiline, // Enable multiline keyboard
+                    textInputAction:
+                        TextInputAction.newline, // Enable new line on enter press
                   ),
-                  validator: inputFormValidator,
-                  maxLines: null, // Allow multiline input
-                  keyboardType:
-                      TextInputType.multiline, // Enable multiline keyboard
-                  textInputAction:
-                      TextInputAction.newline, // Enable new line on enter press
                 ),
                 const SizedBox(
                   height: 16,
@@ -116,28 +118,31 @@ class _TambahBantuanState extends State<TambahBantuan> {
                   future: _daftarHewan,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      return DropDownTextField(
-                        controller: _hewanFormController,
-                        textFieldDecoration: formInputDecoration.copyWith(
-                          prefixIcon: const Icon(Icons.pets),
-                          label: const Text('Jenis Hewan'),
+                      return Material(
+                        elevation: 2,
+                        child: DropDownTextField(
+                          controller: _hewanFormController,
+                          textFieldDecoration: formInputDecoration.copyWith(
+                            prefixIcon: const Icon(Icons.pets),
+                            label: const Text('Jenis Hewan'),
+                          ),
+                          searchAutofocus: true,
+                          clearOption: true,
+                          enableSearch: true,
+                          onChanged: (value) {
+                            setState(() {
+                              if (value is! DropDownValueModel) {
+                                _selectedHewan = null;
+                              } else {
+                                _selectedHewan = value.value;
+                              }
+                            });
+                          },
+                          validator: inputFormValidator,
+                          dropDownItemCount: snapshot.data!.length,
+                          dropDownList: snapshot.data!
+                              .map((AnimalType e) => DropDownValueModel(value: e, name: e.name)).toList(),
                         ),
-                        searchAutofocus: true,
-                        clearOption: true,
-                        enableSearch: true,
-                        onChanged: (value) {
-                          setState(() {
-                            if (value is! DropDownValueModel) {
-                              _selectedHewan = null;
-                            } else {
-                              _selectedHewan = value.value;
-                            }
-                          });
-                        },
-                        validator: inputFormValidator,
-                        dropDownItemCount: snapshot.data!.length,
-                        dropDownList: snapshot.data!
-                            .map((AnimalType e) => DropDownValueModel(value: e, name: e.name)).toList(),
                       );
                     } else if (snapshot.hasError) {
                       return TextButton(
@@ -150,16 +155,17 @@ class _TambahBantuanState extends State<TambahBantuan> {
                     return const CircularProgressIndicator();
                   },
                 ),
-                const Divider(
-                  height: 32,
-                ),
-                TextFormField(
-                  controller: _formAlamatController,
-                  decoration: formInputDecoration.copyWith(
-                          prefixIcon: const Icon(Icons.home),
-                          label: const Text('Alamat'),
-                        ),
-                  validator: inputFormValidator,
+                const SizedBox(height: 16,),
+                Material(
+                  elevation: 2,
+                  child: TextFormField(
+                    controller: _formAlamatController,
+                    decoration: formInputDecoration.copyWith(
+                            prefixIcon: const Icon(Icons.home),
+                            label: const Text('Alamat'),
+                          ),
+                    validator: inputFormValidator,
+                  ),
                 ),
                 const SizedBox(
                   height: 16,
@@ -168,28 +174,31 @@ class _TambahBantuanState extends State<TambahBantuan> {
                   future: _daftarKecamatan,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      return DropDownTextField(
-                        controller: _kecamatanFormController,
-                        textFieldDecoration: formInputDecoration.copyWith(
-                          prefixIcon: const Icon(Icons.location_city),
-                          label: const Text('Kecamatan'),
+                      return Material(
+                        elevation: 2,
+                        child: DropDownTextField(
+                          controller: _kecamatanFormController,
+                          textFieldDecoration: formInputDecoration.copyWith(
+                            prefixIcon: const Icon(Icons.location_city),
+                            label: const Text('Kecamatan'),
+                          ),
+                          searchAutofocus: true,
+                          clearOption: true,
+                          enableSearch: true,
+                          onChanged: (value) {
+                            setState(() {
+                              if (value is! DropDownValueModel) {
+                                _selectedKecamatan = null;
+                              } else {
+                                _selectedKecamatan = value.value;
+                                _loadKelurahan();
+                              }
+                            });
+                          },
+                          validator: inputFormValidator,
+                          dropDownItemCount: snapshot.data!.length,
+                          dropDownList: snapshot.data!.map((Kecamatan e) => DropDownValueModel(value: e, name: e.name)).toList(),
                         ),
-                        searchAutofocus: true,
-                        clearOption: true,
-                        enableSearch: true,
-                        onChanged: (value) {
-                          setState(() {
-                            if (value is! DropDownValueModel) {
-                              _selectedKecamatan = null;
-                            } else {
-                              _selectedKecamatan = value.value;
-                              _loadKelurahan();
-                            }
-                          });
-                        },
-                        validator: inputFormValidator,
-                        dropDownItemCount: snapshot.data!.length,
-                        dropDownList: snapshot.data!.map((Kecamatan e) => DropDownValueModel(value: e, name: e.name)).toList(),
                       );
                     } else if (snapshot.hasError) {
                       return TextButton(
@@ -219,27 +228,30 @@ class _TambahBantuanState extends State<TambahBantuan> {
                         }
                         return const Text('Area Tidak Tersedia');
                       }
-                      return DropDownTextField(
-                        controller: _kelurahanFormController,
-                        textFieldDecoration: formInputDecoration.copyWith(
-                          prefixIcon: const Icon(Icons.holiday_village),
-                          label: const Text('Kelurahan'),
+                      return Material(
+                        elevation: 2,
+                        child: DropDownTextField(
+                          controller: _kelurahanFormController,
+                          textFieldDecoration: formInputDecoration.copyWith(
+                            prefixIcon: const Icon(Icons.holiday_village),
+                            label: const Text('Kelurahan'),
+                          ),
+                          searchAutofocus: true,
+                          clearOption: true,
+                          enableSearch: true,
+                          onChanged: (value) {
+                            setState(() {
+                              if (value is! DropDownValueModel) {
+                                _selectedKelurahan = null;
+                              } else {
+                                _selectedKelurahan = value.value;
+                              }
+                            });
+                          },
+                          validator: inputFormValidator,
+                          dropDownItemCount: snapshot.data!.length,
+                          dropDownList: snapshot.data!.map((Kelurahan e) => DropDownValueModel(value: e, name: e.name)).toList(),
                         ),
-                        searchAutofocus: true,
-                        clearOption: true,
-                        enableSearch: true,
-                        onChanged: (value) {
-                          setState(() {
-                            if (value is! DropDownValueModel) {
-                              _selectedKelurahan = null;
-                            } else {
-                              _selectedKelurahan = value.value;
-                            }
-                          });
-                        },
-                        validator: inputFormValidator,
-                        dropDownItemCount: snapshot.data!.length,
-                        dropDownList: snapshot.data!.map((Kelurahan e) => DropDownValueModel(value: e, name: e.name)).toList(),
                       );
                     } else if (snapshot.hasError) {
                       WidgetsBinding.instance

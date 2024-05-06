@@ -21,9 +21,7 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
   final InputDecoration formInputDecoration = InputDecoration(
     filled: true,
     fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
+    border: InputBorder.none,
     prefixIcon: const Icon(Icons.egg),
     label: const Text("Input"),
     isDense: true,
@@ -89,13 +87,16 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
           child: Center(
             child: Column(
               children: [
-                TextFormField(
-                  controller: _formNameController,
-                  decoration: formInputDecoration.copyWith(
-                    prefixIcon: const Icon(Icons.star),
-                    label: const Text('Nama Hewan'),
+                Material(
+                  elevation: 2,
+                  child: TextFormField(
+                    controller: _formNameController,
+                    decoration: formInputDecoration.copyWith(
+                      prefixIcon: const Icon(Icons.star),
+                      label: const Text('Nama Hewan'),
+                    ),
+                    validator: inputFormValidator,
                   ),
-                  validator: inputFormValidator,
                 ),
                 const SizedBox(
                   height: 16,
@@ -104,28 +105,31 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                   future: _petTypeList,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      return DropDownTextField(
-                        controller: _petTypeFormController,
-                        textFieldDecoration: formInputDecoration.copyWith(
-                          prefixIcon: const Icon(Icons.pets),
-                          label: const Text('Jenis Hewan'),
+                      return Material(
+                        elevation: 2,
+                        child: DropDownTextField(
+                          controller: _petTypeFormController,
+                          textFieldDecoration: formInputDecoration.copyWith(
+                            prefixIcon: const Icon(Icons.pets),
+                            label: const Text('Jenis Hewan'),
+                          ),
+                          searchAutofocus: true,
+                          clearOption: true,
+                          enableSearch: true,
+                          onChanged: (value) {
+                            setState(() {
+                              if (value is! DropDownValueModel) {
+                                _selectedPetType = null;
+                              } else {
+                                _selectedPetType = value.value;
+                              }
+                            });
+                          },
+                          validator: inputFormValidator,
+                          dropDownItemCount: snapshot.data!.length,
+                          dropDownList: snapshot.data!
+                              .map((IDValue e) => DropDownValueModel(value: e, name: e.name)).toList(),
                         ),
-                        searchAutofocus: true,
-                        clearOption: true,
-                        enableSearch: true,
-                        onChanged: (value) {
-                          setState(() {
-                            if (value is! DropDownValueModel) {
-                              _selectedPetType = null;
-                            } else {
-                              _selectedPetType = value.value;
-                            }
-                          });
-                        },
-                        validator: inputFormValidator,
-                        dropDownItemCount: snapshot.data!.length,
-                        dropDownList: snapshot.data!
-                            .map((IDValue e) => DropDownValueModel(value: e, name: e.name)).toList(),
                       );
                     } else if (snapshot.hasError) {
                       return TextButton(
@@ -145,28 +149,31 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                   future: _genderList,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      return DropDownTextField(
-                        controller: _genderFormController,
-                        textFieldDecoration: formInputDecoration.copyWith(
-                          prefixIcon: const Icon(Icons.wc),
-                          label: const Text('Sex'),
+                      return Material(
+                        elevation: 2,
+                        child: DropDownTextField(
+                          controller: _genderFormController,
+                          textFieldDecoration: formInputDecoration.copyWith(
+                            prefixIcon: const Icon(Icons.wc),
+                            label: const Text('Sex'),
+                          ),
+                          searchAutofocus: true,
+                          clearOption: true,
+                          enableSearch: true,
+                          onChanged: (value) {
+                            setState(() {
+                              if (value is! DropDownValueModel) {
+                                _selectedGender = null;
+                              } else {
+                                _selectedGender = value.value;
+                              }
+                            });
+                          },
+                          validator: inputFormValidator,
+                          dropDownItemCount: snapshot.data!.length,
+                          dropDownList: snapshot.data!
+                              .map((IDValue e) => DropDownValueModel(value: e, name: e.name)).toList(),
                         ),
-                        searchAutofocus: true,
-                        clearOption: true,
-                        enableSearch: true,
-                        onChanged: (value) {
-                          setState(() {
-                            if (value is! DropDownValueModel) {
-                              _selectedGender = null;
-                            } else {
-                              _selectedGender = value.value;
-                            }
-                          });
-                        },
-                        validator: inputFormValidator,
-                        dropDownItemCount: snapshot.data!.length,
-                        dropDownList: snapshot.data!
-                            .map((IDValue e) => DropDownValueModel(value: e, name: e.name)).toList(),
                       );
                     } else if (snapshot.hasError) {
                       return TextButton(
@@ -182,21 +189,24 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                 const SizedBox(
                   height: 16,
                 ),
-                TextFormField(
-                  controller: _formDOBController,
-                  decoration: formInputDecoration.copyWith(
-                    prefixIcon: const Icon(Icons.cake),
-                    label: const Text('Tanggal Lahir (Perkiraan)'),
+                Material(
+                  elevation: 2,
+                  child: TextFormField(
+                    controller: _formDOBController,
+                    decoration: formInputDecoration.copyWith(
+                      prefixIcon: const Icon(Icons.cake),
+                      label: const Text('Tanggal Lahir (Perkiraan)'),
+                    ),
+                    validator: inputFormValidator,
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      DateTime? chosenDate = await showDatePicker(context: context, firstDate: DateTime.fromMillisecondsSinceEpoch(0), lastDate: DateTime.now());
+                      if (chosenDate != null) {
+                        dateOfBirth = chosenDate;
+                        _formDOBController.text = DateFormat('dd-MM-yyyy').format(chosenDate);
+                      }
+                    },
                   ),
-                  validator: inputFormValidator,
-                  onTap: () async {
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    DateTime? chosenDate = await showDatePicker(context: context, firstDate: DateTime.fromMillisecondsSinceEpoch(0), lastDate: DateTime.now());
-                    if (chosenDate != null) {
-                      dateOfBirth = chosenDate;
-                      _formDOBController.text = DateFormat('dd-MM-yyyy').format(chosenDate);
-                    }
-                  },
                 ),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
@@ -207,21 +217,24 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Flexible(
-                              child: TextFormField(
-                                controller: _formSterileController,
-                                decoration: formInputDecoration.copyWith(
-                                  prefixIcon: const Icon(Icons.health_and_safety),
-                                  label: const Text('Tanggal Steril'),
+                              child: Material(
+                                elevation: 2,
+                                child: TextFormField(
+                                  controller: _formSterileController,
+                                  decoration: formInputDecoration.copyWith(
+                                    prefixIcon: const Icon(Icons.health_and_safety),
+                                    label: const Text('Tanggal Steril'),
+                                  ),
+                                  validator: inputFormValidator,
+                                  onTap: () async {
+                                    FocusScope.of(context).requestFocus(FocusNode());
+                                    DateTime? chosenDate = await showDatePicker(context: context, firstDate: DateTime.fromMillisecondsSinceEpoch(0), lastDate: DateTime.now());
+                                    if (chosenDate != null) {
+                                      dateOfLastSterile = chosenDate;
+                                      _formSterileController.text = DateFormat('dd-MM-yyyy').format(chosenDate);
+                                    }
+                                  },
                                 ),
-                                validator: inputFormValidator,
-                                onTap: () async {
-                                  FocusScope.of(context).requestFocus(FocusNode());
-                                  DateTime? chosenDate = await showDatePicker(context: context, firstDate: DateTime.fromMillisecondsSinceEpoch(0), lastDate: DateTime.now());
-                                  if (chosenDate != null) {
-                                    dateOfLastSterile = chosenDate;
-                                    _formSterileController.text = DateFormat('dd-MM-yyyy').format(chosenDate);
-                                  }
-                                },
                               ),
                             ),
                             Checkbox(value: _sterileStatus, onChanged: (state) => setState(() {_sterileStatus = state ?? false;})),
@@ -245,21 +258,24 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                         key: const Key("vaksinFormFieldVisible"),
                         children: [
                           Flexible(
-                            child: TextFormField(
-                              controller: _formVaccineController,
-                              decoration: formInputDecoration.copyWith(
-                                prefixIcon: const Icon(Icons.vaccines),
-                                label: const Text('Tanggal Vaksin'),
+                            child: Material(
+                              elevation: 2,
+                              child: TextFormField(
+                                controller: _formVaccineController,
+                                decoration: formInputDecoration.copyWith(
+                                  prefixIcon: const Icon(Icons.vaccines),
+                                  label: const Text('Tanggal Vaksin'),
+                                ),
+                                validator: inputFormValidator,
+                                onTap: () async {
+                                  FocusScope.of(context).requestFocus(FocusNode());
+                                  DateTime? chosenDate = await showDatePicker(context: context, firstDate: DateTime.fromMillisecondsSinceEpoch(0), lastDate: DateTime.now());
+                                  if (chosenDate != null) {
+                                    dateOfLastVaccine = chosenDate;
+                                    _formVaccineController.text = DateFormat('dd-MM-yyyy').format(chosenDate);
+                                  }
+                                },
                               ),
-                              validator: inputFormValidator,
-                              onTap: () async {
-                                FocusScope.of(context).requestFocus(FocusNode());
-                                DateTime? chosenDate = await showDatePicker(context: context, firstDate: DateTime.fromMillisecondsSinceEpoch(0), lastDate: DateTime.now());
-                                if (chosenDate != null) {
-                                  dateOfLastVaccine = chosenDate;
-                                  _formVaccineController.text = DateFormat('dd-MM-yyyy').format(chosenDate);
-                                }
-                              },
                             ),
                           ),
                           Checkbox(value: _vaccineStatus, onChanged: (state) => setState(() {_vaccineStatus = state ?? false;})),

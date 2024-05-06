@@ -51,10 +51,10 @@ class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
                         onRefresh: () async {
                           await _loadDaftar();
                         },
-                        child: ListView.separated(
+                        child: ListView.builder(
                             padding: const EdgeInsets.only(bottom: 96),
                             itemCount: snapshot.data!.length,
-                            separatorBuilder: (context, index) => const Divider(),
+                            // separatorBuilder: (context, index) => const Divider(),
                             itemBuilder: (context, index) => Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: GestureDetector(
@@ -68,7 +68,9 @@ class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
                                     ),
                                     child: Stack(
                                       children: [
-                                          Card.outlined(
+                                          Card.filled(
+                                            color: Colors.white,
+                                            elevation: 2,
                                           clipBehavior: Clip.hardEdge,
                                           child: Row(
                                             children: [
