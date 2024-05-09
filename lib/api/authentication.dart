@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:elaman_hati/models/user.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:dio/dio.dart';
@@ -14,12 +17,23 @@ class AuthenticationException implements Exception {
 class Authentication {
   static final Authentication _instance = Authentication._constructor();
   static final Dio _dio = Dio();
+  final loginListeners = <Function>[];
   final _storage = const FlutterSecureStorage();
   factory Authentication() {
     return _instance;
   }
 
   Authentication._constructor();
+
+  void addLoginListeners(Function listener) {
+    loginListeners.add(listener);
+  }
+
+  void callLoginListeners() {
+    for (var listener in loginListeners) {
+      listener();
+    }
+  }
 
   Future<void> login(String email, String password) async {
     try {
@@ -41,6 +55,7 @@ class Authentication {
       }
 
       await _storage.write(key: "BEARER_TOKEN", value: data['data']['token']);
+      callLoginListeners();
     } catch (error) {
       throw const AuthenticationException("Terjadi kesalahan. Periksa Username atau Password anda dan coba lagi dalam beberapa saat");
     }
@@ -150,4 +165,28 @@ class Authentication {
     }
   }
 
+  Future<User> getCurrentUser() async {
+    if (await isLoggedIn()) {
+      try {
+        final token = await getToken(); 
+        var response = await _dio.get(
+          "${dotenv.env['API_HOST']}/user",
+          options: Options(
+            headers: {
+              HttpHeaders.authorizationHeader: "Bearer $token",
+            },
+          ),
+        );
+        var data = response.data as Map<String, dynamic>;
+        debugPrint(data.toString());
+        if (response.statusCode != 200 || data['status'] == false) throw DioException(requestOptions: response.requestOptions, response: response);
+        
+        return User.fromJson(data['data']);
+      } catch (error) {
+        throw Exception("Terjadi kesalahan. Coba lagi dalam beberapa saat");
+      }
+    } else {
+      throw const AuthenticationException('Not Logged in');
+    }
+  }
 }
