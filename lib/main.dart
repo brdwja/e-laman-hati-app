@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/services.dart';
 
 import './views/homepage/homepage.dart';
 import './views/intro/intro.dart';
@@ -74,6 +75,21 @@ final GoRouter _router = GoRouter(
             
             final List<String> unauthenticatedRoutes = ['/intro', '/login', '/register'];
             final bool loggingIn = unauthenticatedRoutes.contains(state.fullPath);
+
+            if (loggingIn) {
+              SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp
+              ]);
+            } else {
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.landscapeRight,
+                DeviceOrientation.landscapeLeft,
+                DeviceOrientation.portraitUp,
+                DeviceOrientation.portraitDown,
+              ]);
+            }
+
+
             // debugPrint("IS LOGGEDIN? $loggedIn $loggingIn ${state.fullPath}");
             if (!loggedIn) {
               if (loggingIn) return null;
