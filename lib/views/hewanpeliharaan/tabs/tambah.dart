@@ -18,12 +18,12 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
 
   var submitDisabled = false;
 
-  final InputDecoration formInputDecoration = InputDecoration(
+  final InputDecoration formInputDecoration = const InputDecoration(
     filled: true,
     fillColor: Colors.white,
     border: InputBorder.none,
-    prefixIcon: const Icon(Icons.egg),
-    label: const Text("Input"),
+    prefixIcon: Icon(Icons.egg),
+    label: Text("Input"),
     isDense: true,
     
   );

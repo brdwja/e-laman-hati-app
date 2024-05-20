@@ -10,7 +10,7 @@ class Intropage extends StatelessWidget {
       canPop: false,
       onPopInvoked: (didPop) => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
       child: Scaffold(
-        backgroundColor: Color(0xfff063c8),
+        backgroundColor: const Color(0xfff063c8),
         body: (Stack(
           children: [
             Positioned(
@@ -19,7 +19,7 @@ class Intropage extends StatelessWidget {
               child: Container(
                 width: 400,
                 height: 400,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xfff172cd),
                   shape: BoxShape.circle,
                 ),
@@ -31,7 +31,7 @@ class Intropage extends StatelessWidget {
               child: Container(
                 width: 500,
                 height: 500,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xfff172cd),
                   shape: BoxShape.circle,
                 ),
@@ -76,8 +76,8 @@ class Intropage extends StatelessWidget {
             right: 16,
             child: ElevatedButton(
               onPressed: () => context.go('/login'),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Text('Mulai'),
               ),
             ),

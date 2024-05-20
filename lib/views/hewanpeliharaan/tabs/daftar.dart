@@ -184,7 +184,7 @@ class DaftarModalContents extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 32, color: Color(0xff172b4d),),
+          Icon(icon, size: 32, color: const Color(0xff172b4d),),
           Flexible(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),

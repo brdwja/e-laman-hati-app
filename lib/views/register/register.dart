@@ -8,7 +8,7 @@ import '../../api/regions.dart';
 import '../../models/addressarea.dart';
 
 class Registerpage extends StatefulWidget {
-  Registerpage({super.key});
+  const Registerpage({super.key});
 
   @override
   State<Registerpage> createState() => _RegisterpageState();
@@ -88,7 +88,7 @@ class _RegisterpageState extends State<Registerpage> {
       canPop: false,
       onPopInvoked: (didPop) => context.go('/intro'),
       child: Scaffold(
-        backgroundColor: Color(0xfff063c8),
+        backgroundColor: const Color(0xfff063c8),
         body: SafeArea(
           child: (Stack(
             children: [
@@ -98,7 +98,7 @@ class _RegisterpageState extends State<Registerpage> {
                 child: Container(
                   width: 400,
                   height: 400,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Color(0xfff172cd),
                     shape: BoxShape.circle,
                   ),
@@ -110,7 +110,7 @@ class _RegisterpageState extends State<Registerpage> {
                 child: Container(
                   width: 500,
                   height: 500,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Color(0xfff172cd),
                     shape: BoxShape.circle,
                   ),
@@ -135,7 +135,7 @@ class _RegisterpageState extends State<Registerpage> {
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             children: [
-                              Text('DAFTAR AKUN BARU', style: TextStyle(color: Color(0xff8898aa), fontWeight: FontWeight.w600),),
+                              const Text('DAFTAR AKUN BARU', style: TextStyle(color: Color(0xff8898aa), fontWeight: FontWeight.w600),),
                             const SizedBox(height: 16,),
                             Form(
                               key: _formKey,
@@ -290,14 +290,14 @@ class _RegisterpageState extends State<Registerpage> {
                                   })),
                                   RichText(
                                     text: TextSpan(
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.white,
                                       ),
                                       children: [
-                                        TextSpan(text: "I agree with the ", style: TextStyle(color: Colors.black)),
+                                        const TextSpan(text: "I agree with the ", style: TextStyle(color: Colors.black)),
                                         TextSpan(
                                           text: "Privacy Policy",
-                                          style: TextStyle(color: Colors.blue),
+                                          style: const TextStyle(color: Colors.blue),
                                           recognizer: TapGestureRecognizer()..onTap = () => {}
                                         ),
                                       ]
@@ -309,11 +309,11 @@ class _RegisterpageState extends State<Registerpage> {
                                   onPressed: () async {
                                     if (_formKey.currentState!.validate()) {
                                       if (!_formPrivacyPolicyState) {
-                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Setujui Privacy Policy untuk melanjutkan")));
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Setujui Privacy Policy untuk melanjutkan")));
                                         return;
                                       }
                                       if (_selectedKecamatan == null || _selectedKelurahan == null) {
-                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Mohon untuk memilih lokasi yang tersedia")));
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Mohon untuk memilih lokasi yang tersedia")));
                                         return;
                                       }
                                         
@@ -328,8 +328,8 @@ class _RegisterpageState extends State<Registerpage> {
                                                 _selectedKecamatan!.id,
                                                 _selectedKelurahan!.id,
                                                 );
-                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Registrasi Berhasil. Silahkan login")));
                                         if (!context.mounted) return;
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Registrasi Berhasil. Silahkan login")));
                                         context.go('/login');
                                       } catch (error) {
                                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
@@ -339,10 +339,10 @@ class _RegisterpageState extends State<Registerpage> {
                                   },
                                   style: ButtonStyle(
                                     
-                                    backgroundColor: MaterialStateProperty.resolveWith((states) => Color(0xffff6392)),
+                                    backgroundColor: MaterialStateProperty.resolveWith((states) => const Color(0xffff6392)),
                                   ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 16),
                                     child: Text('Buat Akun', style: TextStyle(color: Colors.white),),
                                   ),
                                 )

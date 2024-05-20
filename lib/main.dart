@@ -38,13 +38,13 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'login',
           builder: (BuildContext context, GoRouterState state) {
-            return Loginpage();
+            return const Loginpage();
           },
         ),
         GoRoute(
           path: 'register',
           builder: (BuildContext context, GoRouterState state) {
-            return Registerpage();
+            return const Registerpage();
           },
         ),
         GoRoute(
@@ -120,7 +120,7 @@ class MyApp extends StatelessWidget {
       title: 'e-Laman Hati',
       theme: ThemeData(
         // This is the theme of your application.
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffea4c89)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xffea4c89)),
         useMaterial3: true,
       ),
       routerConfig: _router,

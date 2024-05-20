@@ -5,7 +5,7 @@ import 'package:flutter/gestures.dart';
 import '../../api/authentication.dart';
 
 class Loginpage extends StatefulWidget {
-  Loginpage({super.key});
+  const Loginpage({super.key});
 
   @override
   State<Loginpage> createState() => _LoginpageState();
@@ -27,7 +27,7 @@ class _LoginpageState extends State<Loginpage> {
       onPopInvoked: (didPop) => context.go('/intro'),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Color(0xfff063c8),
+        backgroundColor: const Color(0xfff063c8),
         body: (Stack(
           children: [
             Positioned(
@@ -36,7 +36,7 @@ class _LoginpageState extends State<Loginpage> {
               child: Container(
                 width: 400,
                 height: 400,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xfff172cd),
                   shape: BoxShape.circle,
                 ),
@@ -48,7 +48,7 @@ class _LoginpageState extends State<Loginpage> {
               child: Container(
                 width: 500,
                 height: 500,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xfff172cd),
                   shape: BoxShape.circle,
                 ),
@@ -76,7 +76,7 @@ class _LoginpageState extends State<Loginpage> {
                         _loginButtonDisabled = true;
                       });
                       await Authentication().login(_formEmailController.text, _formPasswordController.text);
-                      print(await Authentication().getToken());
+                      // print(await Authentication().getToken());
                       _formEmailController.text = '';
                       _formPasswordController.text = '';
                       if (!context.mounted) return;
@@ -113,14 +113,14 @@ class _LoginpageState extends State<Loginpage> {
                     children: [
                       RichText(
                       text: TextSpan(
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                         ),
                         children: [
-                          TextSpan(text: "Belum ada akun? "),
+                          const TextSpan(text: "Belum ada akun? "),
                           TextSpan(
                             text: "buat baru.",
-                            style: TextStyle(color: Colors.yellow),
+                            style: const TextStyle(color: Colors.yellow),
                             recognizer: TapGestureRecognizer()..onTap = () => context.go("/register")
                           ),
                         ]
@@ -140,8 +140,8 @@ class _LoginpageState extends State<Loginpage> {
                               fontWeight: FontWeight.bold,
                             ),
                             filled: true,
-                            prefixIcon: Icon(Icons.email),
-                            label: Text("Email"),
+                            prefixIcon: const Icon(Icons.email),
+                            label: const Text("Email"),
                             isDense: true
                           ),
                           validator: (value) {
@@ -164,8 +164,8 @@ class _LoginpageState extends State<Loginpage> {
       
                             ),
                             filled: true,
-                            prefixIcon: Icon(Icons.lock),
-                            label: Text("Password"),
+                            prefixIcon: const Icon(Icons.lock),
+                            label: const Text("Password"),
                             isDense: true
                           ),
                           validator: (value) {
