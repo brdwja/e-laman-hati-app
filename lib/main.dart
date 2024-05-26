@@ -10,6 +10,7 @@ import './views/register/register.dart';
 import './views/requestbantuan/requestbantuan.dart';
 import './views/hewanpeliharaan/hewanpeliharaan.dart';
 import './views/logout/logout.dart';
+import './views/dinahate_rfid/dinahate_rfid.dart';
 
 import './api/authentication.dart';
 
@@ -65,7 +66,12 @@ final GoRouter _router = GoRouter(
             return const Logoutpage();
           },
         ),
-        
+        GoRoute(
+          path: 'dinahate',
+          builder: (BuildContext context, GoRouterState state) {
+            return const DinaHateRFID();
+          },
+        ),
       ],
       redirect: (BuildContext context, GoRouterState state) async {
             // Using `of` method creates a dependency of StreamAuthScope. It will

@@ -5,13 +5,13 @@ class _NavigationDestination {
     const _NavigationDestination({required this.label, required this.icon, required this.selectedIcon, required this.route});
 
     static const _NavigationDestination separator = _NavigationDestination(
-      label: '',
+      label: Text(''),
       icon: Icon(Icons.abc),
       selectedIcon: Icon(Icons.abc),
       route: '',
     );
 
-    final String label;
+    final Widget label;
     final Widget icon;
     final Widget selectedIcon;
     final String route;
@@ -20,29 +20,40 @@ class _NavigationDestination {
 class NavDrawer extends StatelessWidget {
   const NavDrawer({super.key});
 
-  static const List<_NavigationDestination> _navigationDrawerDestinations = <_NavigationDestination>[
-    _NavigationDestination(
-      label: 'Home',
+  static final List<_NavigationDestination> _navigationDrawerDestinations = <_NavigationDestination>[
+    const _NavigationDestination(
+      label: Text('Home'),
       icon: Icon(Icons.home_outlined, color: Color(0xff172b4d)),
       selectedIcon: Icon(Icons.home, color: Color(0xff172b4d)),
       route: '/'
     ),
     _NavigationDestination.separator,
-    _NavigationDestination(
-      label: 'Minta Bantuan',
+    const _NavigationDestination(
+      label: Text('Minta Bantuan'),
       icon: Icon(Icons.calendar_month_outlined, color: Color(0xff172b4d)),
       selectedIcon: Icon(Icons.calendar_month, color: Color(0xff172b4d)),
       route: '/requestbantuan'
     ),
-    _NavigationDestination(
-      label: 'Hewan Peliharaan',
+    const _NavigationDestination(
+      label: Text('Hewan Peliharaan'),
       icon: Icon(Icons.pets_outlined, color: Color(0xff172b4d)),
       selectedIcon: Icon(Icons.pets, color: Color(0xff172b4d)),
       route: '/hewanpeliharaan'
     ),
     _NavigationDestination.separator,
-    _NavigationDestination(
-      label: 'Keluar',
+     _NavigationDestination(
+      label: const Text('Cek Data DinaHate', style: TextStyle(
+        color: Colors.cyan,
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ),),
+      icon: Image.asset('assets/images/dinahate-darkblue.png', height: 32,),
+      selectedIcon: Image.asset('assets/images/dinahate-darkblue.png', height: 32,),
+      route: '/dinahate'
+    ),
+    _NavigationDestination.separator,
+    const _NavigationDestination(
+      label: Text('Keluar'),
       icon: Icon(Icons.rocket_launch_outlined),
       selectedIcon: Icon(Icons.rocket_launch),
       route: '/logout'
@@ -73,12 +84,12 @@ class NavDrawer extends StatelessWidget {
           ..._navigationDrawerDestinations.map(
             (_NavigationDestination destination) {
             if (identical(destination, _NavigationDestination.separator)) {
-              return const Divider(thickness: 1,indent: 25,);
+              return const Divider(thickness: 1,indent: 25, endIndent: 20,);
             }
             return NavigationDrawerDestination(
                 icon: destination.icon,
                 selectedIcon: destination.selectedIcon,
-                label: Text(destination.label));
+                label: destination.label);
             }
           ),
 
