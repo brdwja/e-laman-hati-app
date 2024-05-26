@@ -19,6 +19,7 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
 
   Future<User>? _futureUser;
+  User? _user;
   Future<AnimalStatisticsModel>? _futureStatistics;
 
   Future<void> loadUser() async {
@@ -27,7 +28,10 @@ class _HomepageState extends State<Homepage> {
       _futureUser = future;
     });
     try {
-      await future;
+      final user = await future;
+      setState(() {
+        _user = user;
+      });
     } catch (error) {
       //
     }
@@ -77,7 +81,8 @@ class _HomepageState extends State<Homepage> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
-                WelcomeCard(user: _futureUser,),
+                WelcomeCard(user: _user,),
+                _user != null && (_user!.kecamatan != null && _user!.kelurahan != null) ? const SizedBox(height: 20,) : const SizedBox(),
                 AnimalStatistics(statistics: _futureStatistics,),
 
               ],
@@ -252,101 +257,102 @@ class WelcomeCard extends StatelessWidget {
     required this.user
   });
 
-  final Future<User>? user;
+  final User? user;
 
   @override
   Widget build(BuildContext context) {
-    return Card.filled(
-      clipBehavior: Clip.hardEdge,
-      color: Colors.white,
-      elevation: 1,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              color: Color(0xfff063c8)
-            ),
-            child: SizedBox(
-              height: 160,
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: -280,
-                    right: -150,
-                    child: Container(
-                      width: 400,
-                      height: 400,
-                      decoration: const BoxDecoration(
-                        color: Color(0xfff172cd),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: Image.asset('assets/images/dkpp-putih.png', height: 40,),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Selamat\nDatang,", style: TextStyle(fontSize: 40, fontWeight: FontWeight.w600, height: 1, color: Colors.white),),
-                        SizedBox(height: 8,),
-                        Text("Wargi Bandung!", style: TextStyle(fontSize: 32, height: 1, color: Colors.white),)
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          FutureBuilder<User>(
-            future: user,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.kecamatan == null || snapshot.data!.kelurahan == null) return const SizedBox();
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Card.filled(
+          clipBehavior: Clip.hardEdge,
+          color: Colors.white,
+          elevation: 1,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xfff063c8)
+                ),
+                child: SizedBox(
+                  height: 160,
+                  child: Stack(
                     children: [
-                      const Text('Rumah Anda', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xff32325d))),
-                      Text("${snapshot.data!.kecamatan!.name}, ${snapshot.data!.kelurahan!.name}", style: const TextStyle(fontSize: 16, color: Color(0xff32325d))),
-                      ElevatedButton(
-                        onPressed: () => showModalBottomSheet<void>(
-                                      isScrollControlled: false,
-                                      context: context,
-                                      showDragHandle: true,
-                                      builder: (context) {
-                                        return DoctorsModalContents(user: snapshot.data!,);
-                                      },
-                                    ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xffff6392),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          elevation: 1,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      Positioned(
+                        top: -280,
+                        right: -150,
+                        child: Container(
+                          width: 400,
+                          height: 400,
+                          decoration: const BoxDecoration(
+                            color: Color(0xfff172cd),
+                            shape: BoxShape.circle,
                           ),
                         ),
-                        child: const Text('Dokter Sekitar'),
                       ),
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: Image.asset('assets/images/dkpp-putih.png', height: 40,),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Selamat\nDatang,", style: TextStyle(fontSize: 40, fontWeight: FontWeight.w600, height: 1, color: Colors.white),),
+                            SizedBox(height: 8,),
+                            Text("Wargi Bandung!", style: TextStyle(fontSize: 32, height: 1, color: Colors.white),)
+                          ],
+                        ),
+                      )
                     ],
                   ),
-                );
-              } else if (snapshot.hasError) {
-                return const Text('error');
-              }
-              return const SizedBox();
-
-            },
-          )
-        ],
-      ),
+                ),
+              ),
+              user != null && (user!.kecamatan != null && user!.kelurahan != null) ? Padding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Rumah Anda', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xff32325d))),
+                    Text("${user!.kecamatan!.name}, ${user!.kelurahan!.name}", style: const TextStyle(fontSize: 16, color: Color(0xff32325d))),
+                  ],
+                ),
+              ) : const SizedBox(),
+              
+            ],
+          ),
+        ),
+        user != null && (user!.kecamatan != null && user!.kelurahan != null) ? Positioned(
+          bottom: -20,
+          left: 20,
+          child: ElevatedButton(
+          onPressed: () => showModalBottomSheet<void>(
+                        isScrollControlled: false,
+                        context: context,
+                        showDragHandle: true,
+                        builder: (context) {
+                          return DoctorsModalContents(user: user!,);
+                        },
+                      ),
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size(0, 35),
+            backgroundColor: const Color(0xffff6392),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text('Dokter Sekitar'),
+        ),
+        ) : const SizedBox(),
+        
+      ],
     );
   }
 }
@@ -436,6 +442,9 @@ class _DoctorsModalContentsState extends State<DoctorsModalContents> {
                 future: _futureDoctors,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
+                    if (doctors.isEmpty) {
+                      return const Center(child: Text("Data tidak ditemukan"));
+                    }
                     return ListView.builder(
                       itemCount: doctors.length + 1,
                       itemBuilder: (context, index) {
