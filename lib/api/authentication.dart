@@ -146,21 +146,29 @@ class Authentication {
   }
 
   Future<String> getToken() async {
-    if (await _storage.containsKey(key: "BEARER_TOKEN")) {
-      String? bearerToken = await _storage.read(key: "BEARER_TOKEN");
-      if (bearerToken == null) throw const AuthenticationException('Not Logged in');
-      return bearerToken;
-    } else {
+    try {
+      if (await _storage.containsKey(key: "BEARER_TOKEN")) {
+        String? bearerToken = await _storage.read(key: "BEARER_TOKEN");
+        if (bearerToken == null) throw const AuthenticationException('Not Logged in');
+        return bearerToken;
+      } else {
+        throw const AuthenticationException('Not Logged in');
+      }
+    } catch (error) {
       throw const AuthenticationException('Not Logged in');
     }
   }
 
   Future<bool> isLoggedIn() async {
-    if (await _storage.containsKey(key: "BEARER_TOKEN")) {
-      String? bearerToken = await _storage.read(key: "BEARER_TOKEN");
-      if (bearerToken == null) return false;
-      return true;
-    } else {
+    try {
+      if (await _storage.containsKey(key: "BEARER_TOKEN")) {
+        String? bearerToken = await _storage.read(key: "BEARER_TOKEN");
+        if (bearerToken == null) return false;
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
       return false;
     }
   }
