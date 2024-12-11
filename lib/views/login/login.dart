@@ -103,8 +103,8 @@ class _LoginpageState extends State<Loginpage> {
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 128, bottom: 64),
-                  child: Image.asset('assets/images/lamanhati-putih.png', width: 250,),
+                  padding: const EdgeInsets.only(top: 96, bottom: 64),
+                  child: Image.asset('assets/images/lamanhati-putih.png', width: 200,),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),

@@ -79,7 +79,7 @@ class NavDrawer extends StatelessWidget {
         },
         selectedIndex: routeIndex,
         children: <Widget>[
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 32), child: Image.asset('assets/images/lamanhati-pink.png', width: 200,),),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 32), child: Image.asset('assets/images/lamanhati-pink.png', height:150,),),
           
           ..._navigationDrawerDestinations.map(
             (_NavigationDestination destination) {
