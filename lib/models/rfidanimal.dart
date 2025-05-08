@@ -33,14 +33,14 @@ class RFIDAnimal {
 
   factory RFIDAnimal.fromJson(Map<String, dynamic> json) {
     return RFIDAnimal(
-      rfidToken: json['rfid_token'],
-      age: DateTime.parse(json['age']),
-      weight: json['weight'],
-      photo: json['animal_picture_url'],
+      rfidToken: json['id_chip'],
+      age: DateTime.parse(json['usia_hewan']),
+      weight: json['berat_hewan'],
+      photo: "/gambar_hewan/${json['gambar_hewan']}",
       timestamp: DateTime.parse(json['created_at']),
-      animalType: json['animal_type'],
-      gender: json['gender'],
-      owner: json['owner'],
+      animalType: json['jenis_hewan'],
+      gender: json['jenis_kelamin'],
+      owner: json['nama_pemilik'],
     );
   }
 }

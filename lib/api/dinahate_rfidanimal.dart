@@ -25,15 +25,18 @@ class DinaHateRFIDAnimalAPI {
   Future<RFIDAnimal> get(String rfid) async {
     try {
       Response response = await _dio.get(
-        '${dotenv.env['DINAHATE_API_HOST']}/animal?rfid=$rfid',
+        '${dotenv.env['LAMANHATI_API']}/hewan/$rfid',
       );
       var data = response.data as Map<String, dynamic>;
       if (response.statusCode != 200 || data['status'] == false) throw DioException(requestOptions: response.requestOptions, response: response);
       return RFIDAnimal.fromJson(data['data']);
     } on DioException catch (err) {
-        if (err.response != null && err.response!.data is Map<String, dynamic> && (err.response!.data as Map<String, dynamic>)['error'] != null) {
-          return Future.error((err.response!.data as Map<String, dynamic>)['error']);
-        }
+      if (err.response != null && err.response!.statusCode == 404) {
+      return Future.error("ID Chip Tidak Ditemukan!");
+      }
+      if (err.response != null && err.response!.data is Map<String, dynamic> && (err.response!.data as Map<String, dynamic>)['error'] != null) {
+      return Future.error((err.response!.data as Map<String, dynamic>)['error']);
+      }
       debugPrint(err.toString());
       return Future.error("Terjadi Kesalahan");
     } catch (err) {

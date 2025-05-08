@@ -237,7 +237,7 @@ class RFIDAnimalContents extends StatelessWidget {
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: Image.network(
-                      "${dotenv.env['DINAHATE_STORAGE_HOST']}/${animal.photo}",
+                      "${dotenv.env['LAMANHATI_STORAGE']}/${animal.photo}",
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => const SizedBox(
                       height: 200, child: Center(child: Icon(Icons.error)),
