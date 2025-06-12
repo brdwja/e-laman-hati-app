@@ -17,7 +17,6 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-
   Future<User>? _futureUser;
   User? _user;
   Future<AnimalStatisticsModel>? _futureStatistics;
@@ -35,7 +34,7 @@ class _HomepageState extends State<Homepage> {
     } catch (error) {
       //
     }
-  } 
+  }
 
   Future<void> loadAnimalStatistics() async {
     var future = AnimalStatisticsAPI().get();
@@ -65,27 +64,32 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(
-          color: Color(0xffff6392)
-        ),
+        iconTheme: const IconThemeData(color: Color(0xffff6392)),
         backgroundColor: Colors.white,
         title: const Text('Utama'),
         titleTextStyle: const TextStyle(
-          color: Color(0xff525f7f),
-          fontSize: 16,
-          fontWeight: FontWeight.w600
-        ),
+            color: Color(0xff525f7f),
+            fontSize: 16,
+            fontWeight: FontWeight.w600),
       ),
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
-                WelcomeCard(user: _user,),
-                _user != null && (_user!.kecamatan != null && _user!.kelurahan != null) ? const SizedBox(height: 20,) : const SizedBox(),
-                AnimalStatistics(statistics: _futureStatistics,),
-
-              ],
+            WelcomeCard(
+              user: _user,
+            ),
+            _user != null &&
+                    (_user!.kecamatan != null && _user!.kelurahan != null)
+                ? const SizedBox(
+                    height: 20,
+                  )
+                : const SizedBox(),
+            AnimalStatistics(
+              statistics: _futureStatistics,
+            ),
+          ],
         ),
       ),
       endDrawer: const NavDrawer(),
@@ -98,7 +102,6 @@ class AnimalStatistics extends StatelessWidget {
     super.key,
     required this.statistics,
   });
-
 
   final Future<AnimalStatisticsModel>? statistics;
 
@@ -125,26 +128,36 @@ class AnimalStatistics extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text("Total Peliharaan Tercatat", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xff32325d))),
+                          const Text("Total Peliharaan Tercatat",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff32325d))),
                           RichText(
                             text: TextSpan(
-                              style: const TextStyle(fontSize: 16, color: Color(0xff32325d)),
-                              children: [
-                                const TextSpan(text: "Steril: "),
-                                TextSpan(text: "${data.petOwnershipSterile}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                                TextSpan(text: "/${data.petOwnershipTotal}"),
-                              ]
-                            ),
+                                style: const TextStyle(
+                                    fontSize: 16, color: Color(0xff32325d)),
+                                children: [
+                                  const TextSpan(text: "Steril: "),
+                                  TextSpan(
+                                      text: "${data.petOwnershipSterile}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  TextSpan(text: "/${data.petOwnershipTotal}"),
+                                ]),
                           ),
                           RichText(
                             text: TextSpan(
-                              style: const TextStyle(fontSize: 16, color: Color(0xff32325d)),
-                              children: [
-                                const TextSpan(text: "Vaksin: "),
-                                TextSpan(text: "${data.petOwnershipVaccine}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                                TextSpan(text: "/${data.petOwnershipTotal}"),
-                              ]
-                            ),
+                                style: const TextStyle(
+                                    fontSize: 16, color: Color(0xff32325d)),
+                                children: [
+                                  const TextSpan(text: "Vaksin: "),
+                                  TextSpan(
+                                      text: "${data.petOwnershipVaccine}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  TextSpan(text: "/${data.petOwnershipTotal}"),
+                                ]),
                           ),
                         ],
                       ),
@@ -153,11 +166,17 @@ class AnimalStatistics extends StatelessWidget {
                       color: const Color(0xffb3b1b2),
                       width: 100,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 32),
                         child: Column(
                           children: [
-                            Text("${data.petOwnershipTotal}", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-                            const Text('Ekor', style: TextStyle(color: Colors.white))
+                            Text("${data.petOwnershipTotal}",
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white)),
+                            const Text('Ekor',
+                                style: TextStyle(color: Colors.white))
                           ],
                         ),
                       ),
@@ -165,7 +184,9 @@ class AnimalStatistics extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 8,),
+              const SizedBox(
+                height: 8,
+              ),
               StatisticsCard(
                 title: "Total Hewan Tercatat",
                 vaksin: snapshot.data!.vaccineAnimal,
@@ -174,9 +195,10 @@ class AnimalStatistics extends StatelessWidget {
             ],
           );
         }
-        return const SizedBox(height:320, child: Center(child: CircularProgressIndicator()));
+        return const SizedBox(
+            height: 320, child: Center(child: CircularProgressIndicator()));
       },
-      );
+    );
   }
 }
 
@@ -208,7 +230,11 @@ class StatisticsCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xff32325d))),
+                Text(title,
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff32325d))),
                 // RichText(
                 //   text: TextSpan(
                 //     style: TextStyle(fontSize: 16, color: Color(0xff32325d)),
@@ -221,13 +247,16 @@ class StatisticsCard extends StatelessWidget {
                 // ),
                 RichText(
                   text: TextSpan(
-                    style: const TextStyle(fontSize: 16, color: Color(0xff32325d)),
-                    children: [
-                      const TextSpan(text: "Vaksin: "),
-                      TextSpan(text: "$vaksin", style: const TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(text: "/$total"),
-                    ]
-                  ),
+                      style: const TextStyle(
+                          fontSize: 16, color: Color(0xff32325d)),
+                      children: [
+                        const TextSpan(text: "Vaksin: "),
+                        TextSpan(
+                            text: "$vaksin",
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        TextSpan(text: "/$total"),
+                      ]),
                 ),
               ],
             ),
@@ -239,7 +268,11 @@ class StatisticsCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
               child: Column(
                 children: [
-                  Text("$total", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text("$total",
+                      style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                   const Text('Ekor', style: TextStyle(color: Colors.white))
                 ],
               ),
@@ -252,10 +285,7 @@ class StatisticsCard extends StatelessWidget {
 }
 
 class WelcomeCard extends StatelessWidget {
-  const WelcomeCard({
-    super.key,
-    required this.user
-  });
+  const WelcomeCard({super.key, required this.user});
 
   final User? user;
 
@@ -273,9 +303,7 @@ class WelcomeCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xfff063c8)
-                ),
+                decoration: const BoxDecoration(color: Color(0xfff063c8)),
                 child: SizedBox(
                   height: 160,
                   child: Stack(
@@ -295,16 +323,32 @@ class WelcomeCard extends StatelessWidget {
                       Positioned(
                         top: 16,
                         right: 16,
-                        child: Image.asset('assets/images/dkpp-putih.png', height: 40,),
+                        child: Image.asset(
+                          'assets/images/dkpp-putih.png',
+                          height: 40,
+                        ),
                       ),
                       const Padding(
                         padding: EdgeInsets.all(16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Selamat\nDatang,", style: TextStyle(fontSize: 40, fontWeight: FontWeight.w600, height: 1, color: Colors.white),),
-                            SizedBox(height: 8,),
-                            Text("Wargi Bandung!", style: TextStyle(fontSize: 32, height: 1, color: Colors.white),)
+                            Text(
+                              "Selamat\nDatang,",
+                              style: TextStyle(
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1,
+                                  color: Colors.white),
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
+                            Text(
+                              "Wargi Bandung!",
+                              style: TextStyle(
+                                  fontSize: 32, height: 1, color: Colors.white),
+                            )
                           ],
                         ),
                       )
@@ -312,51 +356,62 @@ class WelcomeCard extends StatelessWidget {
                   ),
                 ),
               ),
-              user != null && (user!.kecamatan != null && user!.kelurahan != null) ? Padding(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Rumah Anda', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xff32325d))),
-                    Text("${user!.kecamatan!.name}, ${user!.kelurahan!.name}", style: const TextStyle(fontSize: 16, color: Color(0xff32325d))),
-                  ],
-                ),
-              ) : const SizedBox(),
-              
+              user != null &&
+                      (user!.kecamatan != null && user!.kelurahan != null)
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Rumah Anda',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff32325d))),
+                          Text(
+                              "${user!.kecamatan!.name}, ${user!.kelurahan!.name}",
+                              style: const TextStyle(
+                                  fontSize: 16, color: Color(0xff32325d))),
+                        ],
+                      ),
+                    )
+                  : const SizedBox(),
             ],
           ),
         ),
-        user != null && (user!.kecamatan != null && user!.kelurahan != null) ? Positioned(
-          bottom: -20,
-          left: 20,
-          child: ElevatedButton(
-          onPressed: () => showModalBottomSheet<void>(
-                        isScrollControlled: false,
-                        context: context,
-                        showDragHandle: true,
-                        builder: (context) {
-                          return DoctorsModalContents(user: user!,);
-                        },
-                      ),
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(0, 35),
-            backgroundColor: const Color(0xffff6392),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: const Text('Dokter Sekitar'),
-        ),
-        ) : const SizedBox(),
-        
+        user != null && (user!.kecamatan != null && user!.kelurahan != null)
+            ? Positioned(
+                bottom: -20,
+                left: 20,
+                child: ElevatedButton(
+                  onPressed: () => showModalBottomSheet<void>(
+                    isScrollControlled: false,
+                    context: context,
+                    showDragHandle: true,
+                    builder: (context) {
+                      return DoctorsModalContents(
+                        user: user!,
+                      );
+                    },
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 35),
+                    backgroundColor: const Color(0xffff6392),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text('Dokter Sekitar'),
+                ),
+              )
+            : const SizedBox(),
       ],
     );
   }
 }
-
 
 class DoctorsModalContents extends StatefulWidget {
   const DoctorsModalContents({required this.user, super.key});
@@ -369,10 +424,11 @@ class DoctorsModalContents extends StatefulWidget {
 class _DoctorsModalContentsState extends State<DoctorsModalContents> {
   Future<Paginated<List<Doctor>>>? _futureDoctors;
   List<Doctor> doctors = [];
-  
+
   void loadDoctors(int page) async {
     debugPrint(widget.user.kecamatan!.id.toString());
-    var future = DoctorsAPI().getPaginatedDoctors(page, widget.user.kecamatan!.id);
+    var future =
+        DoctorsAPI().getPaginatedDoctors(page, widget.user.kecamatan!.id);
     setState(() {
       _futureDoctors = future;
     });
@@ -407,7 +463,11 @@ class _DoctorsModalContentsState extends State<DoctorsModalContents> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 32, color: const Color(0xff172b4d),),
+            Icon(
+              icon,
+              size: 32,
+              color: const Color(0xff172b4d),
+            ),
             Flexible(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -415,7 +475,11 @@ class _DoctorsModalContentsState extends State<DoctorsModalContents> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(name),
-                    Text(content, style: const TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.clip,)
+                    Text(
+                      content,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.clip,
+                    )
                   ],
                 ),
               ),
@@ -434,9 +498,18 @@ class _DoctorsModalContentsState extends State<DoctorsModalContents> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Daftar Dokter Sekitar', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xff172b4d)),),
-            Text("${widget.user.kecamatan!.name}, ${widget.user.kelurahan!.name}"),
-            const SizedBox(height: 8,),
+            const Text(
+              'Daftar Dokter Sekitar',
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xff172b4d)),
+            ),
+            Text(
+                "${widget.user.kecamatan!.name}, ${widget.user.kelurahan!.name}"),
+            const SizedBox(
+              height: 8,
+            ),
             Expanded(
               child: FutureBuilder(
                 future: _futureDoctors,
@@ -449,11 +522,14 @@ class _DoctorsModalContentsState extends State<DoctorsModalContents> {
                       itemCount: doctors.length + 1,
                       itemBuilder: (context, index) {
                         if (index < doctors.length) {
-                          return buildItem(Icons.medical_services, doctors[index].name, doctors[index].address);
+                          return buildItem(Icons.medical_services,
+                              doctors[index].name, doctors[index].address);
                         } else {
-                          if (snapshot.data!.currentPage < snapshot.data!.lastPage) {
+                          if (snapshot.data!.currentPage <
+                              snapshot.data!.lastPage) {
                             loadDoctors(snapshot.data!.currentPage + 1);
-                            return const Center(child: CircularProgressIndicator());
+                            return const Center(
+                                child: CircularProgressIndicator());
                           } else {
                             return const SizedBox();
                           }
@@ -463,14 +539,22 @@ class _DoctorsModalContentsState extends State<DoctorsModalContents> {
                   } else if (snapshot.hasError) {
                     return TextButton(
                       onPressed: () => reloadDoctors(),
-                      child: const Text('Terjadi Kesalahan, tekan untuk coba lagi.'),
+                      child: const Text(
+                          'Terjadi Kesalahan, tekan untuk coba lagi.'),
                     );
                   }
-                  return const SizedBox(height: 240, child: Center(child: CircularProgressIndicator(),),);
+                  return const SizedBox(
+                    height: 240,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
                 },
-                ),
+              ),
             ),
-            const SizedBox(height: 32,),
+            const SizedBox(
+              height: 32,
+            ),
           ],
         ),
       ),
