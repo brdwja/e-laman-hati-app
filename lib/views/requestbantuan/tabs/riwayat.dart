@@ -141,7 +141,11 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
                                                       snapshot.data![index].id);
                                                   _loadReports();
                                                 },
-                                                onDead: () {},
+                                                onDead: () async {
+                                                  await ReportAnimal()
+                                                      .deathEdit(snapshot
+                                                          .data![index].id);
+                                                },
                                                 context: context,
                                               );
                                               try {} catch (error) {

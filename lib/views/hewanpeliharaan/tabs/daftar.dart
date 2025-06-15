@@ -144,7 +144,12 @@ class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
                                                       snapshot.data![index].id);
                                                   _loadDaftar();
                                                 },
-                                                onDead: () {},
+                                                onDead: () async {
+                                                  await PetOwnership()
+                                                      .deathEdit(snapshot
+                                                          .data![index].id);
+                                                  _loadDaftar();
+                                                },
                                                 context: context,
                                               );
                                               try {} catch (error) {

@@ -1,3 +1,5 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
+
 import 'dart:io';
 
 import 'package:dio_smart_retry/dio_smart_retry.dart';
@@ -18,16 +20,14 @@ class ReportAnimal {
 
   ReportAnimal._constructor() {
     _dio.interceptors.add(RetryInterceptor(
-      dio: _dio,
-      logPrint: debugPrint,
-      retryableExtraStatuses: {status403Forbidden},
-      retries: 3,
-      retryDelays: const [
-        Duration(seconds:1)
-      ]
-    ));
+        dio: _dio,
+        logPrint: debugPrint,
+        retryableExtraStatuses: {status403Forbidden},
+        retries: 3,
+        retryDelays: const [Duration(seconds: 1)]));
   }
-  Future<void> create(String address, int kecamatanId, int kelurahanId, String gejala, XFile image, int animalTypeId) async {
+  Future<void> create(String address, int kecamatanId, int kelurahanId,
+      String gejala, XFile image, int animalTypeId) async {
     try {
       String token = await Authentication().getToken();
       debugPrint(token);
@@ -49,12 +49,14 @@ class ReportAnimal {
         ),
       );
       var data = response.data as Map<String, dynamic>;
-      if (response.statusCode != 200 || data['status'] == false) throw DioException(requestOptions: response.requestOptions, response: response);
-    } 
+      if (response.statusCode != 200 || data['status'] == false)
+        throw DioException(
+            requestOptions: response.requestOptions, response: response);
+    }
     // on DioException catch (error) {
     //   debugPrint(error.response?.data);
     //   return Future.error('DE Terjadi kesalahan, coba lagi dalam beberapa saat');
-    // } 
+    // }
     catch (error) {
       return Future.error('Terjadi kesalahan, coba lagi dalam beberapa saat');
     }
@@ -72,7 +74,9 @@ class ReportAnimal {
         ),
       );
       var data = response.data as Map<String, dynamic>;
-      if (response.statusCode != 200 || data['status'] == false) throw DioException(requestOptions: response.requestOptions, response: response);
+      if (response.statusCode != 200 || data['status'] == false)
+        throw DioException(
+            requestOptions: response.requestOptions, response: response);
     } catch (error) {
       return Future.error('Terjadi kesalahan, coba lagi dalam beberapa saat');
     }
@@ -90,9 +94,40 @@ class ReportAnimal {
         ),
       );
       var data = response.data as Map<String, dynamic>;
-      if (response.statusCode != 200 || data['status'] == false) throw DioException(requestOptions: response.requestOptions, response: response);
-      var list = (data['data'] as List<dynamic>).map((e) => AnimalReport.fromJson(e)).toList();
+      if (response.statusCode != 200 || data['status'] == false)
+        throw DioException(
+            requestOptions: response.requestOptions, response: response);
+      var list = (data['data'] as List<dynamic>)
+          .map((e) => AnimalReport.fromJson(e))
+          .toList();
       return list;
+    } catch (error) {
+      return Future.error('Terjadi kesalahan, coba lagi dalam beberapa saat');
+    }
+  }
+
+  Future<void> deathEdit(int id) async {
+    try {
+      String token = await Authentication().getToken();
+      Response response = await _dio.put(
+        // '${dotenv.env['API_HOST']}/petownership?id=$id',
+        "http://127.0.0.1:8000/api/animals/$id",
+        data: {
+          'is_dead': true,
+          'dead_date': DateTime.now().toIso8601String(),
+        },
+        options: Options(
+          headers: {
+            HttpHeaders.authorizationHeader: "Bearer $token",
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      var data = response.data as Map<String, dynamic>;
+      if (response.statusCode != 200 || data['status'] == false)
+        throw DioException(
+            requestOptions: response.requestOptions, response: response);
     } catch (error) {
       return Future.error('Terjadi kesalahan, coba lagi dalam beberapa saat');
     }
