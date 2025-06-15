@@ -1,3 +1,4 @@
+import 'package:elaman_hati/widgets/delete_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -6,7 +7,6 @@ import '../../../api/report.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 
 class RiwayatBantuan extends StatefulWidget {
   const RiwayatBantuan({super.key});
@@ -17,18 +17,16 @@ class RiwayatBantuan extends StatefulWidget {
 class _RiwayatBantuanState extends State<RiwayatBantuan> {
   Future<List<AnimalReport>>? _futureReport;
 
-  Future<void> _loadReports() async
-  {
+  Future<void> _loadReports() async {
     var report = ReportAnimal().getList();
     setState(() {
       _futureReport = report;
     });
     try {
       await report;
-    } catch (error){
+    } catch (error) {
       //
     }
-    
   }
 
   @override
@@ -41,7 +39,10 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        _futureReport == null ? const SizedBox(height: 0,)
+        _futureReport == null
+            ? const SizedBox(
+                height: 0,
+              )
             : Center(
                 child: FutureBuilder<List<AnimalReport>>(
                   future: _futureReport,
@@ -66,14 +67,16 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
                                       context: context,
                                       showDragHandle: true,
                                       builder: (context) {
-                                        return RiwayatModalContents(report: snapshot.data![index],);
+                                        return RiwayatModalContents(
+                                          report: snapshot.data![index],
+                                        );
                                       },
                                     ),
                                     child: Stack(
                                       children: [
-                                          Card.filled(
-                                            color: Colors.white,
-                                            elevation: 2,
+                                        Card.filled(
+                                          color: Colors.white,
+                                          elevation: 2,
                                           clipBehavior: Clip.hardEdge,
                                           child: Row(
                                             children: [
@@ -82,21 +85,24 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
                                                 width: 150,
                                                 height: 180,
                                                 fit: BoxFit.cover,
-                                                errorBuilder: (context, error, stackTrace) =>
-                                                  const SizedBox(
-                                                    width: 150,
-                                                    height: 180,
-                                                    child: Center(
-                                                      child: Icon(Icons.error),
-                                                    ),
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
+                                                    const SizedBox(
+                                                  width: 150,
+                                                  height: 180,
+                                                  child: Center(
+                                                    child: Icon(Icons.error),
                                                   ),
+                                                ),
                                               ),
                                               Expanded(
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     mainAxisSize:
                                                         MainAxisSize.max,
                                                     children: [
@@ -128,26 +134,38 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
                                           top: 8,
                                           right: 8,
                                           child: IconButton(
-                                              onPressed: () async {
-                                                try {
-                                                  await ReportAnimal().delete(snapshot.data![index].id);
+                                            onPressed: () async {
+                                              deleteDialog(
+                                                onMisData: () async {
+                                                  await ReportAnimal().delete(
+                                                      snapshot.data![index].id);
                                                   _loadReports();
-                                                } catch (error) {
-                                                  if (!context.mounted) return;
-                                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
-                                                }
-                                              },
-                                              icon: const Icon(Icons.delete),
+                                                },
+                                                onDead: () {},
+                                                context: context,
+                                              );
+                                              try {} catch (error) {
+                                                if (!context.mounted) return;
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      error.toString(),
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            icon: const Icon(Icons.delete),
                                           ),
                                         ),
                                         Positioned(
                                           bottom: 12,
                                           right: 16,
                                           child: Text(
-                                            DateFormat('dd-MM-yyyy')
-                                                .format(snapshot
-                                                    .data![index]
-                                                    .timestamp),
+                                            DateFormat('dd-MM-yyyy').format(
+                                                snapshot
+                                                    .data![index].timestamp),
                                             style: const TextStyle(
                                               fontSize: 14,
                                               color: Colors.grey,
@@ -161,22 +179,24 @@ class _RiwayatBantuanState extends State<RiwayatBantuan> {
                       );
                     } else if (snapshot.hasError) {
                       return TextButton(
-                          onPressed: () => _loadReports(),
-                          child: const Text('Terjadi Kesalahan, tekan untuk coba lagi.'),
-                        );
+                        onPressed: () => _loadReports(),
+                        child: const Text(
+                            'Terjadi Kesalahan, tekan untuk coba lagi.'),
+                      );
                     }
                     return const CircularProgressIndicator();
                   },
                 ),
               ),
-              Positioned(
-                bottom: 20,
-                right: 20,
-                child: FloatingActionButton(
-                  onPressed: () => launchUrlString("https://wa.me/66621649270?text=Halo%20DKPP%2C%20saya%20masyarakat%20bandung%20ingin%20meminta%20bantuan%20berikut.%0ANama%3A%0AAlamat%3A"),
-                  child: const Icon(Icons.chat),
-                ),
-              ),
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton(
+            onPressed: () => launchUrlString(
+                "https://wa.me/66621649270?text=Halo%20DKPP%2C%20saya%20masyarakat%20bandung%20ingin%20meminta%20bantuan%20berikut.%0ANama%3A%0AAlamat%3A"),
+            child: const Icon(Icons.chat),
+          ),
+        ),
       ],
     );
   }
@@ -192,7 +212,11 @@ class RiwayatModalContents extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 32, color: const Color(0xff172b4d),),
+          Icon(
+            icon,
+            size: 32,
+            color: const Color(0xff172b4d),
+          ),
           Flexible(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -200,7 +224,11 @@ class RiwayatModalContents extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name),
-                  Text(content, style: const TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.clip,)
+                  Text(
+                    content,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.clip,
+                  )
                 ],
               ),
             ),
@@ -213,40 +241,56 @@ class RiwayatModalContents extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: Image.network(
-                      "${dotenv.env['STORAGE_HOST']}/${report.photo}",
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const SizedBox(
-                      height: 200, child: Center(child: Icon(Icons.error)),
-                      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Image.network(
+                    "${dotenv.env['STORAGE_HOST']}/${report.photo}",
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const SizedBox(
+                      height: 200,
+                      child: Center(child: Icon(Icons.error)),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16,),
-                buildItem(Icons.pets, 'Jenis', report.jenisHewan.name),
-                const SizedBox(height: 8,),
-                buildItem(Icons.sick, 'Gejala', report.symptom),
-                const SizedBox(height: 8,),
-                buildItem(Icons.place, 'Lokasi', "${report.kelurahan.name}, ${report.kecamatan.name}"),
-                const SizedBox(height: 8,),
-                buildItem(Icons.home, 'Alamat Lengkap', report.address),
-                const SizedBox(height: 8,),
-                buildItem(Icons.calendar_month, 'Waktu Aduan', DateFormat('HH:mm dd-MM-yyyy').format(report.timestamp)),
-                const SizedBox(height: 32,),
-              ],
-            ),
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              buildItem(Icons.pets, 'Jenis', report.jenisHewan.name),
+              const SizedBox(
+                height: 8,
+              ),
+              buildItem(Icons.sick, 'Gejala', report.symptom),
+              const SizedBox(
+                height: 8,
+              ),
+              buildItem(Icons.place, 'Lokasi',
+                  "${report.kelurahan.name}, ${report.kecamatan.name}"),
+              const SizedBox(
+                height: 8,
+              ),
+              buildItem(Icons.home, 'Alamat Lengkap', report.address),
+              const SizedBox(
+                height: 8,
+              ),
+              buildItem(Icons.calendar_month, 'Waktu Aduan',
+                  DateFormat('HH:mm dd-MM-yyyy').format(report.timestamp)),
+              const SizedBox(
+                height: 32,
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 }
