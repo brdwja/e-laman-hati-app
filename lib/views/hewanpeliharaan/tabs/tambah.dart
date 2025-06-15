@@ -25,7 +25,6 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
     prefixIcon: Icon(Icons.egg),
     label: Text("Input"),
     isDense: true,
-    
   );
 
   String? inputFormValidator(String? value) {
@@ -48,9 +47,9 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
   final TextEditingController _formSterileController = TextEditingController();
   DateTime? dateOfLastSterile;
 
-
   Future<List<IDValue>>? _genderList;
-  final SingleValueDropDownController _genderFormController = SingleValueDropDownController();
+  final SingleValueDropDownController _genderFormController =
+      SingleValueDropDownController();
   IDValue? _selectedGender;
   void _loadGender() {
     setState(() {
@@ -59,7 +58,8 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
   }
 
   Future<List<IDValue>>? _petTypeList;
-  final SingleValueDropDownController _petTypeFormController = SingleValueDropDownController();
+  final SingleValueDropDownController _petTypeFormController =
+      SingleValueDropDownController();
   IDValue? _selectedPetType;
   void _loadPetType() {
     setState(() {
@@ -128,15 +128,17 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                           validator: inputFormValidator,
                           dropDownItemCount: snapshot.data!.length,
                           dropDownList: snapshot.data!
-                              .map((IDValue e) => DropDownValueModel(value: e, name: e.name)).toList(),
+                              .map((IDValue e) =>
+                                  DropDownValueModel(value: e, name: e.name))
+                              .toList(),
                         ),
                       );
                     } else if (snapshot.hasError) {
                       return TextButton(
-                          onPressed: () => _loadPetType(),
-                          child: const Text(
-                              'Terjadi Kesalahan, tekan untuk coba lagi.',
-                            ),
+                        onPressed: () => _loadPetType(),
+                        child: const Text(
+                          'Terjadi Kesalahan, tekan untuk coba lagi.',
+                        ),
                       );
                     }
                     return const CircularProgressIndicator();
@@ -172,15 +174,17 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                           validator: inputFormValidator,
                           dropDownItemCount: snapshot.data!.length,
                           dropDownList: snapshot.data!
-                              .map((IDValue e) => DropDownValueModel(value: e, name: e.name)).toList(),
+                              .map((IDValue e) =>
+                                  DropDownValueModel(value: e, name: e.name))
+                              .toList(),
                         ),
                       );
                     } else if (snapshot.hasError) {
                       return TextButton(
-                          onPressed: () => _loadGender(),
-                          child: const Text(
-                              'Terjadi Kesalahan, tekan untuk coba lagi.',
-                            ),
+                        onPressed: () => _loadGender(),
+                        child: const Text(
+                          'Terjadi Kesalahan, tekan untuk coba lagi.',
+                        ),
                       );
                     }
                     return const CircularProgressIndicator();
@@ -200,96 +204,134 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                     validator: inputFormValidator,
                     onTap: () async {
                       FocusScope.of(context).requestFocus(FocusNode());
-                      DateTime? chosenDate = await showDatePicker(context: context, firstDate: DateTime.fromMillisecondsSinceEpoch(0), lastDate: DateTime.now());
+                      DateTime? chosenDate = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+                          lastDate: DateTime.now());
                       if (chosenDate != null) {
                         dateOfBirth = chosenDate;
-                        _formDOBController.text = DateFormat('dd-MM-yyyy').format(chosenDate);
+                        _formDOBController.text =
+                            DateFormat('dd-MM-yyyy').format(chosenDate);
                       }
                     },
                   ),
                 ),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
-                  child: _sterileStatus ? Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Row(
-                          key: const Key("sterilFormFieldVisible"),
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                  child: _sterileStatus
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Row(
+                            key: const Key("sterilFormFieldVisible"),
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Material(
+                                  elevation: 2,
+                                  child: TextFormField(
+                                    controller: _formSterileController,
+                                    decoration: formInputDecoration.copyWith(
+                                      prefixIcon:
+                                          const Icon(Icons.health_and_safety),
+                                      label: const Text('Tanggal Steril'),
+                                    ),
+                                    validator: inputFormValidator,
+                                    onTap: () async {
+                                      FocusScope.of(context)
+                                          .requestFocus(FocusNode());
+                                      DateTime? chosenDate =
+                                          await showDatePicker(
+                                              context: context,
+                                              firstDate: DateTime
+                                                  .fromMillisecondsSinceEpoch(
+                                                      0),
+                                              lastDate: DateTime.now());
+                                      if (chosenDate != null) {
+                                        dateOfLastSterile = chosenDate;
+                                        _formSterileController.text =
+                                            DateFormat('dd-MM-yyyy')
+                                                .format(chosenDate);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                              Checkbox(
+                                  value: _sterileStatus,
+                                  onChanged: (state) => setState(() {
+                                        _sterileStatus = state ?? false;
+                                      })),
+                            ],
+                          ),
+                        )
+                      : Row(
+                          key: const Key("sterilFormFieldNotVisible"),
+                          children: [
+                            Checkbox(
+                                value: _sterileStatus,
+                                onChanged: (state) => setState(() {
+                                      _sterileStatus = state ?? false;
+                                    })),
+                            const Text("Peliharaan Sudah Steril")
+                          ],
+                        ),
+                ),
+                SizedBox(
+                  height: _vaccineStatus ? 16 : 0,
+                ),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: _vaccineStatus
+                      ? Row(
+                          key: const Key("vaksinFormFieldVisible"),
                           children: [
                             Flexible(
                               child: Material(
                                 elevation: 2,
                                 child: TextFormField(
-                                  controller: _formSterileController,
+                                  controller: _formVaccineController,
                                   decoration: formInputDecoration.copyWith(
-                                    prefixIcon: const Icon(Icons.health_and_safety),
-                                    label: const Text('Tanggal Steril'),
+                                    prefixIcon: const Icon(Icons.vaccines),
+                                    label: const Text('Tanggal Vaksin'),
                                   ),
                                   validator: inputFormValidator,
                                   onTap: () async {
-                                    FocusScope.of(context).requestFocus(FocusNode());
-                                    DateTime? chosenDate = await showDatePicker(context: context, firstDate: DateTime.fromMillisecondsSinceEpoch(0), lastDate: DateTime.now());
+                                    FocusScope.of(context)
+                                        .requestFocus(FocusNode());
+                                    DateTime? chosenDate = await showDatePicker(
+                                        context: context,
+                                        firstDate:
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                                0),
+                                        lastDate: DateTime.now());
                                     if (chosenDate != null) {
-                                      dateOfLastSterile = chosenDate;
-                                      _formSterileController.text = DateFormat('dd-MM-yyyy').format(chosenDate);
+                                      dateOfLastVaccine = chosenDate;
+                                      _formVaccineController.text =
+                                          DateFormat('dd-MM-yyyy')
+                                              .format(chosenDate);
                                     }
                                   },
                                 ),
                               ),
                             ),
-                            Checkbox(value: _sterileStatus, onChanged: (state) => setState(() {_sterileStatus = state ?? false;})),
+                            Checkbox(
+                                value: _vaccineStatus,
+                                onChanged: (state) => setState(() {
+                                      _vaccineStatus = state ?? false;
+                                    })),
+                          ],
+                        )
+                      : Row(
+                          key: const Key("vaksinFormFieldNotVisible"),
+                          children: [
+                            Checkbox(
+                                value: _vaccineStatus,
+                                onChanged: (state) => setState(() {
+                                      _vaccineStatus = state ?? false;
+                                    })),
+                            const Text("Peliharaan Sudah Divaksin")
                           ],
                         ),
-                  )
-                      : Row(
-                      key: const Key("sterilFormFieldNotVisible"),
-                      children: [
-                        Checkbox(value: _sterileStatus, onChanged: (state) => setState(() {
-                        _sterileStatus = state ?? false;
-                      })),  
-                      const Text("Peliharaan Sudah Steril")
-                      ],
-                    ),
-                ),
-                SizedBox(height: _vaccineStatus ? 16 : 0,),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child: _vaccineStatus ? Row(
-                        key: const Key("vaksinFormFieldVisible"),
-                        children: [
-                          Flexible(
-                            child: Material(
-                              elevation: 2,
-                              child: TextFormField(
-                                controller: _formVaccineController,
-                                decoration: formInputDecoration.copyWith(
-                                  prefixIcon: const Icon(Icons.vaccines),
-                                  label: const Text('Tanggal Vaksin'),
-                                ),
-                                validator: inputFormValidator,
-                                onTap: () async {
-                                  FocusScope.of(context).requestFocus(FocusNode());
-                                  DateTime? chosenDate = await showDatePicker(context: context, firstDate: DateTime.fromMillisecondsSinceEpoch(0), lastDate: DateTime.now());
-                                  if (chosenDate != null) {
-                                    dateOfLastVaccine = chosenDate;
-                                    _formVaccineController.text = DateFormat('dd-MM-yyyy').format(chosenDate);
-                                  }
-                                },
-                              ),
-                            ),
-                          ),
-                          Checkbox(value: _vaccineStatus, onChanged: (state) => setState(() {_vaccineStatus = state ?? false;})),
-                        ],
-                      )
-                      : Row(
-                      key: const Key("vaksinFormFieldNotVisible"),
-                      children: [
-                        Checkbox(value: _vaccineStatus, onChanged: (state) => setState(() {
-                        _vaccineStatus = state ?? false;
-                      })),  
-                      const Text("Peliharaan Sudah Divaksin")
-                      ],
-                    ),
                 ),
                 const Divider(
                   height: 32,
@@ -335,8 +377,8 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                   },
                   icon: const Icon(Icons.camera),
                   style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
-                  ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8))),
                   label: _imageFile == null
                       ? const Text('Tambahkan Gambar')
                       : const Text("Ubah Gambar"),
@@ -356,65 +398,69 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                   height: 16,
                 ),
                 ElevatedButton(
-                  
-                  onPressed: submitDisabled ? null : () async {
-                    // debugPrint(_selectedHewan.toString());
-                    // debugPrint(_selectedHewan?.name);
-                    // debugPrint(_selectedKecamatan.toString());
-                    // debugPrint(_selectedKecamatan?.name);
-                    // debugPrint(_selectedKelurahan.toString());
-                    // debugPrint(_selectedKelurahan?.name);
-                    // return;
-                    if (_formKey.currentState!.validate()) {
-                      if (_imageFile == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              "Mohon untuk menambahkan gambar",
-                            ),
-                          ),
-                        );
-                        return;
-                      }
-                      try {
-                        setState(() {
-                          submitDisabled = true;
-                        });
-                        debugPrint("requesting");
-                        await PetOwnership().create(
-                          _imageFile!,
-                          _selectedGender!.id,
-                          _selectedPetType!.id,
-                          dateOfLastSterile,
-                          dateOfLastVaccine,
-                          dateOfBirth!,
-                          _formNameController.text,
-                        );
-                        debugPrint("requesting done");
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil mengajukan bantuan!")));
-                        _imageFile = null;
-                        _formNameController.text = '';
-                        _genderFormController.clearDropDown();
-                        _petTypeFormController.clearDropDown();
-                        DefaultTabController.of(context).animateTo(0);
-                        setState(() {
-                          _imageFile = null;
-                        });
-                      } catch (error) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(error.toString())));
-                      } finally {
-                        setState(() {
-                          submitDisabled = false;
-                        });
-                      }
-                    }
-                  },
+                  onPressed: submitDisabled
+                      ? null
+                      : () async {
+                          // debugPrint(_selectedHewan.toString());
+                          // debugPrint(_selectedHewan?.name);
+                          // debugPrint(_selectedKecamatan.toString());
+                          // debugPrint(_selectedKecamatan?.name);
+                          // debugPrint(_selectedKelurahan.toString());
+                          // debugPrint(_selectedKelurahan?.name);
+                          // return;
+                          if (_formKey.currentState!.validate()) {
+                            if (_imageFile == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Mohon untuk menambahkan gambar",
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+                            try {
+                              setState(() {
+                                submitDisabled = true;
+                              });
+                              debugPrint("requesting");
+                              await PetOwnership().create(
+                                _imageFile!,
+                                _selectedGender!.id,
+                                _selectedPetType!.id,
+                                dateOfLastSterile,
+                                dateOfLastVaccine,
+                                dateOfBirth!,
+                                _formNameController.text,
+                              );
+                              debugPrint("requesting done");
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content:
+                                          Text("Berhasil menambahka data!")));
+                              _imageFile = null;
+                              _formNameController.text = '';
+                              _genderFormController.clearDropDown();
+                              _petTypeFormController.clearDropDown();
+                              DefaultTabController.of(context).animateTo(0);
+                              setState(() {
+                                _imageFile = null;
+                              });
+                            } catch (error) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(error.toString())));
+                            } finally {
+                              setState(() {
+                                submitDisabled = false;
+                              });
+                            }
+                          }
+                        },
                   style: ElevatedButton.styleFrom(
                     elevation: 4,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
