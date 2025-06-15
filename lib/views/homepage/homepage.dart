@@ -22,17 +22,15 @@ class _HomepageState extends State<Homepage> {
   Future<AnimalStatisticsModel>? _futureStatistics;
 
   Future<void> loadUser() async {
-    var future = Authentication().getCurrentUser();
-    setState(() {
-      _futureUser = future;
-    });
+    debugPrint('loadUser DIPANGGIL');
     try {
-      final user = await future;
+      final user = await Authentication().getCurrentUser();
+      debugPrint('HASIL getCurrentUser: $user');
       setState(() {
         _user = user;
       });
-    } catch (error) {
-      //
+    } catch (e) {
+      debugPrint('ERROR loadUser: $e');
     }
   }
 
@@ -62,6 +60,9 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
+    // Tambahkan debug print di sini
+    debugPrint('ROLE USER: ${_user?.role}');
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Color(0xffff6392)),
@@ -81,7 +82,7 @@ class _HomepageState extends State<Homepage> {
               user: _user,
             ),
             _user != null &&
-                    (_user!.kecamatan != null && _user!.kelurahan != null)
+                    (_user!.kecamatan != null && _user!.kecamatan != null)
                 ? const SizedBox(
                     height: 20,
                   )
@@ -92,7 +93,7 @@ class _HomepageState extends State<Homepage> {
           ],
         ),
       ),
-      endDrawer: const NavDrawer(),
+      endDrawer: NavDrawer(role: _user?.role),
     );
   }
 }
