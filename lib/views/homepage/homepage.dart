@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:elaman_hati/api/animalstatistics.dart';
 import 'package:elaman_hati/api/authentication.dart';
 import 'package:elaman_hati/api/doctors_api.dart';
@@ -87,9 +89,11 @@ class _HomepageState extends State<Homepage> {
                     height: 20,
                   )
                 : const SizedBox(),
-            AnimalStatistics(
-              statistics: _futureStatistics,
-            ),
+            (_user?.role != "admin")
+                ? SizedBox.shrink()
+                : AnimalStatistics(
+                    statistics: _futureStatistics,
+                  ),
           ],
         ),
       ),
