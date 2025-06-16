@@ -1,9 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="e-Laman Hati"
-        android:permission="android.permission.INTERNET"
-        android:name="${applicationName}"
+        android:label="e-laman-hati-app"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

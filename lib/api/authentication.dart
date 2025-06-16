@@ -38,7 +38,7 @@ class Authentication {
   Future<void> login(String email, String password) async {
     try {
       Response response = await _dio.post(
-        "${dotenv.env['API_HOST']}/auth/user",
+        "${dotenv.env['API_HOST']}/login",
         data: {
           'email': email,
           'password': password,
@@ -72,10 +72,11 @@ class Authentication {
       String phoneNumber,
       String address,
       int kecamatanId,
-      int kelurahanId) async {
+      int kelurahanId,
+      String role) async {
     try {
       Response response = await _dio.post(
-        "${dotenv.env['API_HOST']}/auth/create/user",
+        "${dotenv.env['API_HOST']}/register",
         data: {
           'email': email,
           'password': password,
@@ -83,8 +84,9 @@ class Authentication {
           'id_card_number': idCardNumber,
           'phone_number': phoneNumber,
           'address': address,
-          'district_id': kecamatanId,
-          'neighborhood_id': kelurahanId,
+          'id_district': kecamatanId,
+          'id_sub_district': kelurahanId,
+          'role': role,
         },
       );
       var data = response.data as Map<String, dynamic>;
@@ -197,21 +199,26 @@ class Authentication {
       try {
         final token = await getToken();
         var response = await _dio.get(
-          "${dotenv.env['API_HOST']}/user",
+          "${dotenv.env['API_HOST']}/me",
           options: Options(
             headers: {
               HttpHeaders.authorizationHeader: "Bearer $token",
             },
           ),
         );
+        // Tambahkan debugPrint di sini:
+        debugPrint('STATUS CODE: ${response.statusCode}');
+        debugPrint('RESPONSE DATA: ${response.data}');
         var data = response.data as Map<String, dynamic>;
-        debugPrint(data.toString());
-        if (response.statusCode != 200 || data['status'] == false)
+
+        debugPrint("API user data: ${data['data']}");
+        if (response.statusCode != 200 || data['status'] == false) {
           throw DioException(
               requestOptions: response.requestOptions, response: response);
-
+        }
         return User.fromJson(data['data']);
       } catch (error) {
+        debugPrint('ERROR getCurrentUser: $error');
         throw Exception("Terjadi kesalahan. Coba lagi dalam beberapa saat");
       }
     } else {
