@@ -210,6 +210,7 @@ class Authentication {
         debugPrint('STATUS CODE: ${response.statusCode}');
         debugPrint('RESPONSE DATA: ${response.data}');
         var data = response.data as Map<String, dynamic>;
+
         debugPrint("API user data: ${data['data']}");
         if (response.statusCode != 200 || data['status'] == false) {
           throw DioException(
