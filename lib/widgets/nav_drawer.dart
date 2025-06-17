@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:go_router/go_router.dart';
 
 class _NavigationDestination {
@@ -22,21 +23,17 @@ class _NavigationDestination {
 }
 
 class NavDrawer extends StatelessWidget {
-  final String? role; // Tambahkan ini
-  const NavDrawer({super.key, this.role});
+  const NavDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('ROLE DI NAVDRAWER: $role');
-
+    final String? role = GetStorage().read('USER_ROLE');
     final hewanLabel = (role == 'peternak')
         ? const Text('Hewan Ternak')
         : const Text('Hewan Peliharaan');
 
     String currentRoute =
         GoRouter.of(context).routeInformationProvider.value.uri.toString();
-
-    // Tentukan label menu sesuai role
 
     // Ganti _navigationDrawerDestinations menjadi variabel lokal
     final List<_NavigationDestination> navigationDrawerDestinations =

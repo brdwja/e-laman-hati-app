@@ -1,10 +1,13 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
+import 'package:elaman_hati/api/authentication.dart';
 import 'package:elaman_hati/api/petownership.dart';
 import 'package:elaman_hati/models/pet.dart';
-import 'package:elaman_hati/widgets/delete_dialog.dart';
+import 'package:elaman_hati/widgets/animal_list_card.dart';
 import 'package:intl/intl.dart';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import '../../../models/user.dart';
 
 class DaftarHewanPeliharaan extends StatefulWidget {
   const DaftarHewanPeliharaan({super.key});
@@ -13,15 +16,21 @@ class DaftarHewanPeliharaan extends StatefulWidget {
 }
 
 class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
-  Future<List<Pet>>? _listFuture;
+  Future<List<dynamic>>? _listFuture;
+  User? _user;
 
   Future<void> _loadDaftar() async {
-    var report = PetOwnership().getList();
+    var petFuture = PetOwnership().getList();
+    var typeFuture = PetOwnership().getAnimalsType();
+    var user = await Authentication().getCurrentUser();
+
     setState(() {
-      _listFuture = report;
+      _listFuture = Future.wait([petFuture, typeFuture]);
+      _user = user;
     });
+
     try {
-      await report;
+      await _listFuture;
     } catch (error) {
       //
     }
@@ -35,191 +44,107 @@ class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        _listFuture == null
-            ? const SizedBox(
-                height: 0,
-              )
-            : Center(
-                child: FutureBuilder<List<Pet>>(
-                  future: _listFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      if (snapshot.data!.isEmpty) {
-                        return const Center(child: Text('Daftar Kosong'));
-                      }
-                      return RefreshIndicator(
-                        onRefresh: () async {
-                          await _loadDaftar();
-                        },
-                        child: ListView.builder(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      child: Stack(
+        children: [
+          _listFuture == null
+              ? const SizedBox(
+                  height: 0,
+                )
+              : Center(
+                  child: FutureBuilder<List<dynamic>>(
+                    future: _listFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final data = snapshot.data!;
+                        if (data.isEmpty || data.length < 2) {
+                          return const Center(child: Text('Daftar Kosong'));
+                        }
+                        final List<Pet> pets = data[0] as List<Pet>;
+                        final Map<int, String> types =
+                            data[1] as Map<int, String>;
+                        final String? role = _user?.role!.toLowerCase();
+                        if (pets.isEmpty) {
+                          return Center(
+                            child: Text(
+                              role == 'peternak'
+                                  ? 'Belum ada hewan ternak yang terdaftar.'
+                                  : 'Belum ada hewan peliharaan yang terdaftar.',
+                            ),
+                          );
+                        }
+
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            await _loadDaftar();
+                          },
+                          child: ListView.builder(
                             padding: const EdgeInsets.only(bottom: 96),
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) => Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: GestureDetector(
-                                    onTap: () => showModalBottomSheet<void>(
-                                      isScrollControlled: true,
-                                      context: context,
-                                      showDragHandle: true,
-                                      builder: (context) {
-                                        return DaftarModalContents(
-                                          daftarItem: snapshot.data![index],
-                                        );
-                                      },
-                                    ),
-                                    child: Stack(
-                                      children: [
-                                        Card.filled(
-                                          color: Colors.white,
-                                          elevation: 2,
-                                          clipBehavior: Clip.hardEdge,
-                                          child: Row(
-                                            children: [
-                                              Image.network(
-                                                "${dotenv.env['STORAGE_HOST']}/${snapshot.data![index].photo}",
-                                                width: 150,
-                                                height: 180,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error,
-                                                        stackTrace) =>
-                                                    const SizedBox(
-                                                  width: 150,
-                                                  height: 180,
-                                                  child: Center(
-                                                    child: Icon(Icons.error),
-                                                  ),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    children: [
-                                                      Row(
-                                                        children: [
-                                                          const Icon(
-                                                              Icons.pets),
-                                                          const SizedBox(
-                                                            width: 4,
-                                                          ),
-                                                          Expanded(
-                                                            child: Text(
-                                                              snapshot
-                                                                  .data![index]
-                                                                  .petType
-                                                                  .name,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                      Text(
-                                                        snapshot
-                                                            .data![index].name,
-                                                        style: const TextStyle(
-                                                            fontSize: 32),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: 8,
-                                          right: 8,
-                                          child: IconButton(
-                                            onPressed: () async {
-                                              deleteDialog(
-                                                onMisData: () async {
-                                                  await PetOwnership().delete(
-                                                      snapshot.data![index].id);
-                                                  _loadDaftar();
-                                                },
-                                                onDead: () async {
-                                                  await PetOwnership()
-                                                      .deathEdit(snapshot
-                                                          .data![index].id);
-                                                  _loadDaftar();
-                                                },
-                                                context: context,
-                                              );
-                                              try {} catch (error) {
-                                                if (!context.mounted) return;
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      error.toString(),
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                            icon: const Icon(Icons.delete),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          bottom: 12,
-                                          right: 16,
-                                          child: Text(
-                                            snapshot.data![index].getAge(),
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                            itemCount: pets.length,
+                            itemBuilder: (context, index) {
+                              final pet = pets[index];
+                              final typeName =
+                                  types[pet.type_of_animal_id] ?? 'Unknown';
+
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: GestureDetector(
+                                  onTap: () => showModalBottomSheet<void>(
+                                    isScrollControlled: true,
+                                    context: context,
+                                    showDragHandle: true,
+                                    builder: (context) {
+                                      return DaftarModalContents(
+                                        daftarItem: pet,
+                                        type: typeName,
+                                      );
+                                    },
                                   ),
-                                )),
-                      );
-                    } else if (snapshot.hasError) {
-                      return TextButton(
-                        onPressed: () => _loadDaftar(),
-                        child: const Text(
-                            'Terjadi Kesalahan, tekan untuk coba lagi.'),
-                      );
-                    }
-                    return const CircularProgressIndicator();
-                  },
+                                  child: AnimalListCard(
+                                    type_of_animal: typeName,
+                                    animal_name: pet.animal_name,
+                                    onRefresh: _loadDaftar,
+                                    id: pet.id,
+                                    age: pet.getAge(),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return TextButton(
+                          onPressed: () => _loadDaftar(),
+                          child: const Text(
+                              'Terjadi Kesalahan, tekan untuk coba lagi.'),
+                        );
+                      }
+                      return const CircularProgressIndicator();
+                    },
+                  ),
                 ),
-              ),
-        // Positioned(
-        //   bottom: 20,
-        //   right: 20,
-        //   child: FloatingActionButton(
-        //     onPressed: () => launchUrlString("https://wa.me/66621649270?text=Halo%20DKPP%2C%20saya%20masyarakat%20bandung%20ingin%20meminta%20bantuan%20berikut.%0ANama%3A%0AAlamat%3A"),
-        //     child: const Icon(Icons.chat),
-        //   ),
-        // ),
-      ],
+        ],
+      ),
     );
   }
 }
 
 class DaftarModalContents extends StatelessWidget {
-  const DaftarModalContents({required this.daftarItem, super.key});
+  const DaftarModalContents(
+      {required this.daftarItem, super.key, required this.type});
   final Pet daftarItem;
+  final String type;
 
   Widget buildItem(IconData icon, String name, String content) {
     return DefaultTextStyle.merge(
       style: const TextStyle(color: Color(0xff172b4d)),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
             icon,
-            size: 32,
+            size: 24,
             color: const Color(0xff172b4d),
           ),
           Flexible(
@@ -228,7 +153,10 @@ class DaftarModalContents extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name),
+                  Text(
+                    name,
+                    style: TextStyle(fontSize: 13),
+                  ),
                   Text(
                     content,
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -256,8 +184,8 @@ class DaftarModalContents extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 child: AspectRatio(
                   aspectRatio: 1,
-                  child: Image.network(
-                    "${dotenv.env['STORAGE_HOST']}/${daftarItem.photo}",
+                  child: Image.asset(
+                    "assets/images/random.png",
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) =>
                         const SizedBox(
@@ -270,11 +198,11 @@ class DaftarModalContents extends StatelessWidget {
               const SizedBox(
                 height: 16,
               ),
-              buildItem(Icons.star, 'Nama Peliharaan', daftarItem.name),
+              buildItem(Icons.star, 'Nama Peliharaan', daftarItem.animal_name),
               const SizedBox(
                 height: 8,
               ),
-              buildItem(Icons.pets, 'Jenis', daftarItem.petType.name),
+              buildItem(Icons.pets, 'Jenis', type),
               const SizedBox(
                 height: 8,
               ),
@@ -292,7 +220,7 @@ class DaftarModalContents extends StatelessWidget {
                   Icons.health_and_safety,
                   'Steril',
                   daftarItem.lastSterile == null
-                      ? "Belum Vaksin"
+                      ? "Belum Steril"
                       : DateFormat('dd-MM-yyyy')
                           .format(daftarItem.lastSterile!)),
               const SizedBox(
@@ -302,7 +230,12 @@ class DaftarModalContents extends StatelessWidget {
               const SizedBox(
                 height: 8,
               ),
-              buildItem(Icons.wc, 'Sex', daftarItem.gender.name),
+              buildItem(Icons.wc, 'Sex', daftarItem.gender),
+              const SizedBox(
+                height: 8,
+              ),
+              buildItem(Icons.line_weight, 'Berat',
+                  '${daftarItem.weight.toString()} Kg'),
               const SizedBox(
                 height: 32,
               ),
@@ -313,3 +246,12 @@ class DaftarModalContents extends StatelessWidget {
     );
   }
 }
+
+// Positioned(
+//   bottom: 20,
+//   right: 20,
+//   child: FloatingActionButton(
+//     onPressed: () => launchUrlString("https://wa.me/66621649270?text=Halo%20DKPP%2C%20saya%20masyarakat%20bandung%20ingin%20meminta%20bantuan%20berikut.%0ANama%3A%0AAlamat%3A"),
+//     child: const Icon(Icons.chat),
+//   ),
+// ),

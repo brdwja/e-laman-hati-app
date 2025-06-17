@@ -46,7 +46,7 @@ class User {
       kelurahan: json['kelurahan'] != null
           ? Kelurahan.fromJson(json['kelurahan'])
           : null,
-      role: json['role'],
+      role: json['role'] ?? '',
       createdAt: json['created_at'],
       updatedAt: json['updated_at'], // Pastikan key sesuai JSON
     );

@@ -18,13 +18,10 @@ class Animals {
 
   Animals._constructor() {
     _dio.interceptors.add(RetryInterceptor(
-      dio: _dio,
-      logPrint: debugPrint,
-      retryableExtraStatuses: {status403Forbidden},
-      retryDelays: const [
-        Duration(seconds:1)
-      ]
-    ));
+        dio: _dio,
+        logPrint: debugPrint,
+        retryableExtraStatuses: {status403Forbidden},
+        retryDelays: const [Duration(seconds: 1)]));
   }
 
   Future<List<AnimalType>> getActiveAnimal() async {
@@ -42,12 +39,13 @@ class Animals {
       var data = response.data as Map<String, dynamic>;
       if (data['status'] == false) throw Exception();
 
-      var listAnimal = (data['data'] as List<dynamic>).map((e) => AnimalType(id: e['id'], name: e['name'])).toList();
+      var listAnimal = (data['data'] as List<dynamic>)
+          .map((e) => AnimalType(id: e['id'], name: e['name']))
+          .toList();
       return listAnimal;
     } catch (error) {
       debugPrint("AccError: ${error.toString()}");
       throw const HttpException('Terjadi Kesalahan, Mohon coba lagi.');
     }
   }
-
 }

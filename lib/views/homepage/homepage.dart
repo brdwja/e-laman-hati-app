@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unused_field
 
 import 'package:elaman_hati/api/animalstatistics.dart';
 import 'package:elaman_hati/api/authentication.dart';
@@ -8,6 +8,7 @@ import 'package:elaman_hati/models/pagination.dart';
 import 'package:elaman_hati/models/statisticsdata.dart';
 import 'package:elaman_hati/models/user.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../widgets/nav_drawer.dart';
 
@@ -24,10 +25,8 @@ class _HomepageState extends State<Homepage> {
   Future<AnimalStatisticsModel>? _futureStatistics;
 
   Future<void> loadUser() async {
-    debugPrint('loadUser DIPANGGIL');
     try {
       final user = await Authentication().getCurrentUser();
-      debugPrint('HASIL getCurrentUser: $user');
       setState(() {
         _user = user;
       });
@@ -62,9 +61,7 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    // Tambahkan debug print di sini
-    debugPrint('ROLE USER: ${_user?.role}');
-
+    final String? role = GetStorage().read('USER_ROLE');
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Color(0xffff6392)),
@@ -89,7 +86,7 @@ class _HomepageState extends State<Homepage> {
                     height: 20,
                   )
                 : const SizedBox(),
-            (_user?.role != "admin")
+            (role != "admin")
                 ? SizedBox.shrink()
                 : AnimalStatistics(
                     statistics: _futureStatistics,
@@ -97,7 +94,7 @@ class _HomepageState extends State<Homepage> {
           ],
         ),
       ),
-      endDrawer: NavDrawer(role: _user?.role),
+      endDrawer: NavDrawer(),
     );
   }
 }
