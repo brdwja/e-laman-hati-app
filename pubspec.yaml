@@ -46,6 +46,7 @@ dependencies:
   dropdown_textfield: ^1.0.8
   time_machine: ^0.9.17
   win32: ^5.3.0
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:

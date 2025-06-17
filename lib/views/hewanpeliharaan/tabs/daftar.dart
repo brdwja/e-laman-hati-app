@@ -1,12 +1,13 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:elaman_hati/api/authentication.dart';
 import 'package:elaman_hati/api/petownership.dart';
 import 'package:elaman_hati/models/pet.dart';
 import 'package:elaman_hati/widgets/animal_list_card.dart';
 import 'package:intl/intl.dart';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import '../../../models/user.dart';
 
 class DaftarHewanPeliharaan extends StatefulWidget {
   const DaftarHewanPeliharaan({super.key});
@@ -16,13 +17,16 @@ class DaftarHewanPeliharaan extends StatefulWidget {
 
 class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
   Future<List<dynamic>>? _listFuture;
+  User? _user;
 
   Future<void> _loadDaftar() async {
     var petFuture = PetOwnership().getList();
     var typeFuture = PetOwnership().getAnimalsType();
+    var user = await Authentication().getCurrentUser();
 
     setState(() {
       _listFuture = Future.wait([petFuture, typeFuture]);
+      _user = user;
     });
 
     try {
@@ -60,6 +64,17 @@ class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
                         final List<Pet> pets = data[0] as List<Pet>;
                         final Map<int, String> types =
                             data[1] as Map<int, String>;
+                        final String? role = _user?.role!.toLowerCase();
+                        if (pets.isEmpty) {
+                          return Center(
+                            child: Text(
+                              role == 'peternak'
+                                  ? 'Belum ada hewan ternak yang terdaftar.'
+                                  : 'Belum ada hewan peliharaan yang terdaftar.',
+                            ),
+                          );
+                        }
+
                         return RefreshIndicator(
                           onRefresh: () async {
                             await _loadDaftar();

@@ -214,7 +214,7 @@ class PetOwnership {
         throw DioException(
             requestOptions: response.requestOptions, response: response);
     } catch (error) {
-      //return Future.error(error);
+      return Future.error(error);
     }
   }
 

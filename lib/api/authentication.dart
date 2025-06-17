@@ -1,3 +1,5 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
+
 import 'dart:io';
 
 import 'package:elaman_hati/models/user.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:dio/dio.dart';
 
 import 'package:flutter/foundation.dart';
+import 'package:get_storage/get_storage.dart';
 
 class AuthenticationException implements Exception {
   final String msg;
@@ -216,7 +219,12 @@ class Authentication {
           throw DioException(
               requestOptions: response.requestOptions, response: response);
         }
-        return User.fromJson(data['data']);
+        final user = User.fromJson(data['data']);
+
+        final storage = GetStorage();
+        await storage.write('USER_ROLE', user.role);
+
+        return user;
       } catch (error) {
         debugPrint('ERROR getCurrentUser: $error');
         throw Exception("Terjadi kesalahan. Coba lagi dalam beberapa saat");

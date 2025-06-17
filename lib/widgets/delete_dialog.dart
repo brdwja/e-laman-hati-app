@@ -26,6 +26,7 @@ Future<void> deleteDialog({
                         ? "Konfirmasi Hewan Mati"
                         : "Konfirmasi Hapus",
                 style: const TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
               ),
             ),
             content: SizedBox(

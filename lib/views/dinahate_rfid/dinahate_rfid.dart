@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors_in_immutables
+
 import 'package:elaman_hati/api/dinahate_rfidanimal.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:elaman_hati/models/rfidanimal.dart';
