@@ -1,14 +1,16 @@
-// ignore_for_file: prefer_const_constructors, curly_braces_in_flow_control_structures
+// ignore_for_file: curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
 
 Future<void> deleteDialog({
   required BuildContext context,
   required Future<void> Function() onMisData,
-  required VoidCallback onDead,
+  required Future<void> Function() onDead,
 }) async {
   bool isLoading = false;
   bool isSecondConfirm = false;
+  bool isSecondConfirmDead = false;
+
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
@@ -18,7 +20,11 @@ Future<void> deleteDialog({
             backgroundColor: Colors.white,
             title: Center(
               child: Text(
-                isSecondConfirm ? "Konfirmasi Penghapusan" : "Konfirmasi Hapus",
+                isSecondConfirm
+                    ? "Konfirmasi Penghapusan Data Salah"
+                    : isSecondConfirmDead
+                        ? "Konfirmasi Hewan Mati"
+                        : "Konfirmasi Hapus",
                 style: const TextStyle(fontSize: 20),
               ),
             ),
@@ -27,7 +33,7 @@ Future<void> deleteDialog({
               child: Center(
                 child: isLoading
                     ? const CircularProgressIndicator()
-                    : SizedBox.shrink(),
+                    : const SizedBox.shrink(),
               ),
             ),
             actions: isLoading
@@ -38,30 +44,14 @@ Future<void> deleteDialog({
                       children: isSecondConfirm
                           ? [
                               TextButton(
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Color(0xFFB0BEC5),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
+                                style: _cancelStyle(),
                                 child: const Text('Batal'),
                                 onPressed: () {
                                   setState(() => isSecondConfirm = false);
                                 },
                               ),
                               TextButton(
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Color(0xffff6392),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
+                                style: _deleteStyle(),
                                 child: const Text('Hapus'),
                                 onPressed: () async {
                                   setState(() => isLoading = true);
@@ -71,39 +61,44 @@ Future<void> deleteDialog({
                                 },
                               ),
                             ]
-                          : [
-                              TextButton(
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Color(0xFFB0BEC5),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                          : isSecondConfirmDead
+                              ? [
+                                  TextButton(
+                                    style: _cancelStyle(),
+                                    child: const Text('Batal'),
+                                    onPressed: () {
+                                      setState(
+                                          () => isSecondConfirmDead = false);
+                                    },
                                   ),
-                                ),
-                                child: const Text('Mati'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  onDead();
-                                },
-                              ),
-                              TextButton(
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Color(0xffff6392),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                  TextButton(
+                                    style: _deleteStyle(),
+                                    child: const Text('Konfirmasi'),
+                                    onPressed: () async {
+                                      setState(() => isLoading = true);
+                                      await onDead();
+                                      if (context.mounted)
+                                        Navigator.of(context).pop();
+                                    },
                                   ),
-                                ),
-                                child: const Text('Kesalahan data'),
-                                onPressed: () {
-                                  setState(() => isSecondConfirm = true);
-                                },
-                              ),
-                            ],
+                                ]
+                              : [
+                                  TextButton(
+                                    style: _deleteStyle(),
+                                    child: const Text('Mati'),
+                                    onPressed: () {
+                                      setState(
+                                          () => isSecondConfirmDead = true);
+                                    },
+                                  ),
+                                  TextButton(
+                                    style: _deleteStyle(),
+                                    child: const Text('Kesalahan data'),
+                                    onPressed: () {
+                                      setState(() => isSecondConfirm = true);
+                                    },
+                                  ),
+                                ],
                     ),
                   ],
           );
@@ -112,3 +107,17 @@ Future<void> deleteDialog({
     },
   );
 }
+
+ButtonStyle _cancelStyle() => TextButton.styleFrom(
+      backgroundColor: const Color(0xFFB0BEC5),
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );
+
+ButtonStyle _deleteStyle() => TextButton.styleFrom(
+      backgroundColor: const Color(0xffff6392),
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );

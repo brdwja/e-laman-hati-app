@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_brace_in_string_interps, curly_braces_in_flow_control_structures
+// ignore_for_file: unnecessary_brace_in_string_interps, curly_braces_in_flow_control_structures, avoid_print
 
 import 'dart:io';
 
@@ -153,6 +153,28 @@ class PetOwnership {
     }
   }
 
+  Future<Map<int, String>> getAnimalsType() async {
+    try {
+      String token = await Authentication().getToken();
+      Response response = await _dio.get(
+        '${dotenv.env['API_HOST']}/type_of_animal',
+        options: Options(
+          headers: {
+            HttpHeaders.authorizationHeader: "Bearer $token",
+          },
+        ),
+      );
+
+      final List<dynamic> data = response.data;
+      return {
+        for (var item in data)
+          item['id'] as int: item['type_of_animal'] as String,
+      };
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
   Future<List<Pet>> getList() async {
     try {
       String token = await Authentication().getToken();
@@ -165,16 +187,13 @@ class PetOwnership {
         ),
       );
       var data = response.data as Map<String, dynamic>;
-      print(data);
       if (response.statusCode != 200 || data['status'] == false)
         throw DioException(
             requestOptions: response.requestOptions, response: response);
       var list =
           (data['data'] as List<dynamic>).map((e) => Pet.fromJson(e)).toList();
       return list;
-    } catch (error, stackTrace) {
-      print("❌ Caught error in getList(): $error");
-      print("📍 StackTrace: $stackTrace");
+    } catch (error) {
       return Future.error(error);
     }
   }
@@ -183,7 +202,7 @@ class PetOwnership {
     try {
       String token = await Authentication().getToken();
       Response response = await _dio.delete(
-        '${dotenv.env['API_HOST']}/petownership?id=$id',
+        '${dotenv.env['API_HOST']}/animals/$id',
         options: Options(
           headers: {
             HttpHeaders.authorizationHeader: "Bearer $token",
@@ -195,7 +214,7 @@ class PetOwnership {
         throw DioException(
             requestOptions: response.requestOptions, response: response);
     } catch (error) {
-      return Future.error('Terjadi kesalahan, coba lagi dalam beberapa saat');
+      //return Future.error(error);
     }
   }
 
@@ -203,8 +222,8 @@ class PetOwnership {
     try {
       String token = await Authentication().getToken();
       Response response = await _dio.put(
-        // '${dotenv.env['API_HOST']}/petownership?id=$id',
-        "http://127.0.0.1:8000/api/animals/$id",
+        '${dotenv.env['API_HOST']}/animals/$id/mark-dead',
+        // "http://127.0.0.1:8000/api/animals/$id",
         data: {
           'is_dead': true,
           'dead_date': DateTime.now().toIso8601String(),

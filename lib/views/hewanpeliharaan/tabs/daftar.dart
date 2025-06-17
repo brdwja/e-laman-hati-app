@@ -15,16 +15,18 @@ class DaftarHewanPeliharaan extends StatefulWidget {
 }
 
 class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
-  Future<List<Pet>>? _listFuture;
+  Future<List<dynamic>>? _listFuture;
 
   Future<void> _loadDaftar() async {
-    var report = PetOwnership().getList();
+    var petFuture = PetOwnership().getList();
+    var typeFuture = PetOwnership().getAnimalsType();
 
     setState(() {
-      _listFuture = report;
+      _listFuture = Future.wait([petFuture, typeFuture]);
     });
+
     try {
-      await report;
+      await _listFuture;
     } catch (error) {
       //
     }
@@ -47,44 +49,54 @@ class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
                   height: 0,
                 )
               : Center(
-                  child: FutureBuilder<List<Pet>>(
+                  child: FutureBuilder<List<dynamic>>(
                     future: _listFuture,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        if (snapshot.data!.isEmpty) {
+                        final data = snapshot.data!;
+                        if (data.isEmpty || data.length < 2) {
                           return const Center(child: Text('Daftar Kosong'));
                         }
+                        final List<Pet> pets = data[0] as List<Pet>;
+                        final Map<int, String> types =
+                            data[1] as Map<int, String>;
                         return RefreshIndicator(
                           onRefresh: () async {
                             await _loadDaftar();
                           },
                           child: ListView.builder(
-                              padding: const EdgeInsets.only(bottom: 96),
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) => Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: GestureDetector(
-                                      onTap: () => showModalBottomSheet<void>(
-                                        isScrollControlled: true,
-                                        context: context,
-                                        showDragHandle: true,
-                                        builder: (context) {
-                                          return DaftarModalContents(
-                                            daftarItem: snapshot.data![index],
-                                          );
-                                        },
-                                      ),
-                                      child: AnimalListCard(
-                                        type_of_animal_id: snapshot
-                                            .data![index].type_of_animal_id,
-                                        animal_name:
-                                            snapshot.data![index].animal_name,
-                                        onRefresh: _loadDaftar,
-                                        id: snapshot.data![index].id,
-                                        age: snapshot.data![index].getAge(),
-                                      ),
-                                    ),
-                                  )),
+                            padding: const EdgeInsets.only(bottom: 96),
+                            itemCount: pets.length,
+                            itemBuilder: (context, index) {
+                              final pet = pets[index];
+                              final typeName =
+                                  types[pet.type_of_animal_id] ?? 'Unknown';
+
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: GestureDetector(
+                                  onTap: () => showModalBottomSheet<void>(
+                                    isScrollControlled: true,
+                                    context: context,
+                                    showDragHandle: true,
+                                    builder: (context) {
+                                      return DaftarModalContents(
+                                        daftarItem: pet,
+                                        type: typeName,
+                                      );
+                                    },
+                                  ),
+                                  child: AnimalListCard(
+                                    type_of_animal: typeName,
+                                    animal_name: pet.animal_name,
+                                    onRefresh: _loadDaftar,
+                                    id: pet.id,
+                                    age: pet.getAge(),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         );
                       } else if (snapshot.hasError) {
                         return TextButton(
@@ -104,18 +116,20 @@ class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
 }
 
 class DaftarModalContents extends StatelessWidget {
-  const DaftarModalContents({required this.daftarItem, super.key});
+  const DaftarModalContents(
+      {required this.daftarItem, super.key, required this.type});
   final Pet daftarItem;
+  final String type;
 
   Widget buildItem(IconData icon, String name, String content) {
     return DefaultTextStyle.merge(
       style: const TextStyle(color: Color(0xff172b4d)),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
             icon,
-            size: 32,
+            size: 24,
             color: const Color(0xff172b4d),
           ),
           Flexible(
@@ -124,7 +138,10 @@ class DaftarModalContents extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name),
+                  Text(
+                    name,
+                    style: TextStyle(fontSize: 13),
+                  ),
                   Text(
                     content,
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -152,8 +169,8 @@ class DaftarModalContents extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 child: AspectRatio(
                   aspectRatio: 1,
-                  child: Image.network(
-                    "${dotenv.env['STORAGE_HOST']}/${daftarItem.image}",
+                  child: Image.asset(
+                    "assets/images/random.png",
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) =>
                         const SizedBox(
@@ -170,7 +187,7 @@ class DaftarModalContents extends StatelessWidget {
               const SizedBox(
                 height: 8,
               ),
-              buildItem(Icons.pets, 'Jenis', "jenis dummy"),
+              buildItem(Icons.pets, 'Jenis', type),
               const SizedBox(
                 height: 8,
               ),
@@ -188,7 +205,7 @@ class DaftarModalContents extends StatelessWidget {
                   Icons.health_and_safety,
                   'Steril',
                   daftarItem.lastSterile == null
-                      ? "Belum Vaksin"
+                      ? "Belum Steril"
                       : DateFormat('dd-MM-yyyy')
                           .format(daftarItem.lastSterile!)),
               const SizedBox(
@@ -198,10 +215,15 @@ class DaftarModalContents extends StatelessWidget {
               const SizedBox(
                 height: 8,
               ),
-              // buildItem(Icons.wc, 'Sex', daftarItem.gender.name),
-              // const SizedBox(
-              //   height: 32,
-              // ),
+              buildItem(Icons.wc, 'Sex', daftarItem.gender),
+              const SizedBox(
+                height: 8,
+              ),
+              buildItem(Icons.line_weight, 'Berat',
+                  '${daftarItem.weight.toString()} Kg'),
+              const SizedBox(
+                height: 32,
+              ),
             ],
           ),
         ),

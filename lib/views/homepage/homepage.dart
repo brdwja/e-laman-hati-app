@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unused_field
 
 import 'package:elaman_hati/api/animalstatistics.dart';
 import 'package:elaman_hati/api/authentication.dart';

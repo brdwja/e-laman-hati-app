@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 
 class AnimalListCard extends StatelessWidget {
   final int id;
-  final int type_of_animal_id;
+  final String type_of_animal;
   final String animal_name;
   final VoidCallback onRefresh;
   final String age;
   const AnimalListCard({
     super.key,
     required this.id,
-    required this.type_of_animal_id,
+    required this.type_of_animal,
     required this.animal_name,
     required this.onRefresh,
     required this.age,
@@ -29,7 +29,7 @@ class AnimalListCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             offset: const Offset(0, 4),
             blurRadius: 10,
             spreadRadius: 0,
@@ -56,16 +56,24 @@ class AnimalListCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      type_of_animal_id.toString(),
-                      style: const TextStyle(color: Colors.grey),
+                      type_of_animal,
+                      style: const TextStyle(color: Colors.grey, fontSize: 13),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      animal_name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.pets_rounded,
+                          size: 16,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          animal_name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -74,11 +82,10 @@ class AnimalListCard extends StatelessWidget {
           ),
           Positioned(
             top: 8,
-            right: 0,
-            child: IconButton(
-              icon: const Icon(Icons.delete),
+            right: 8,
+            child: TextButton.icon(
               onPressed: () async {
-                deleteDialog(
+                await deleteDialog(
                   onMisData: () async {
                     await PetOwnership().delete(id);
                     onRefresh();
@@ -90,6 +97,20 @@ class AnimalListCard extends StatelessWidget {
                   context: context,
                 );
               },
+              label: Text(
+                "Hapus",
+                style: TextStyle(color: Colors.red[700]),
+              ),
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                minimumSize: Size(0, 0),
+                backgroundColor: Colors.red[50],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ),
           Positioned(
