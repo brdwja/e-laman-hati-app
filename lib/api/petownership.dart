@@ -202,7 +202,7 @@ class PetOwnership {
     try {
       String token = await Authentication().getToken();
       Response response = await _dio.delete(
-        '${dotenv.env['API_HOST']}/animals/$id',
+        '${dotenv.env['API_HOST']}/animals/$id/delete',
         options: Options(
           headers: {
             HttpHeaders.authorizationHeader: "Bearer $token",
