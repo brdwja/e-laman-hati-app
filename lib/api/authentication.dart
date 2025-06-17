@@ -38,6 +38,7 @@ class Authentication {
   Future<void> login(String email, String password) async {
     try {
       Response response = await _dio.post(
+        // "${dotenv.env['API_HOST']}/auth/user",
         "${dotenv.env['API_HOST']}/login",
         data: {
           'email': email,

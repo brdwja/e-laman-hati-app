@@ -157,7 +157,7 @@ class PetOwnership {
     try {
       String token = await Authentication().getToken();
       Response response = await _dio.get(
-        '${dotenv.env['API_HOST']}/petownership/user',
+        '${dotenv.env['API_HOST']}/animals/show',
         options: Options(
           headers: {
             HttpHeaders.authorizationHeader: "Bearer $token",
@@ -165,14 +165,17 @@ class PetOwnership {
         ),
       );
       var data = response.data as Map<String, dynamic>;
+      print(data);
       if (response.statusCode != 200 || data['status'] == false)
         throw DioException(
             requestOptions: response.requestOptions, response: response);
       var list =
           (data['data'] as List<dynamic>).map((e) => Pet.fromJson(e)).toList();
       return list;
-    } catch (error) {
-      return Future.error('Terjadi kesalahan, coba lagi dalam beberapa saat');
+    } catch (error, stackTrace) {
+      print("❌ Caught error in getList(): $error");
+      print("📍 StackTrace: $stackTrace");
+      return Future.error(error);
     }
   }
 

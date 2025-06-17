@@ -10,17 +10,18 @@ class HewanPeliharaan extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      initialIndex: 0,
       length: 2,
+      initialIndex: 0,
       child: Scaffold(
         appBar: AppBar(
           iconTheme: const IconThemeData(color: Color(0xffff6392)),
           backgroundColor: Colors.white,
           title: const Text('Hewan Peliharaan'),
           titleTextStyle: const TextStyle(
-              color: Color(0xff525f7f),
-              fontSize: 16,
-              fontWeight: FontWeight.w600),
+            color: Color(0xff525f7f),
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
           bottom: const TabBar(
             tabs: [
               Tab(
@@ -34,13 +35,15 @@ class HewanPeliharaan extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
-          children: <Widget>[
-            DaftarHewanPeliharaan(),
-            TambahHewanPeliharaan(),
-          ],
-        ),
         endDrawer: const NavDrawer(),
+        body: const SafeArea(
+          child: TabBarView(
+            children: [
+              DaftarHewanPeliharaan(),
+              TambahHewanPeliharaan(),
+            ],
+          ),
+        ),
       ),
     );
   }

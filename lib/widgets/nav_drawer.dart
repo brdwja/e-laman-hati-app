@@ -22,7 +22,7 @@ class _NavigationDestination {
 }
 
 class NavDrawer extends StatelessWidget {
-  final String? role; // Tambahkan ini
+  final String? role;
   const NavDrawer({super.key, this.role});
 
   @override
@@ -35,8 +35,6 @@ class NavDrawer extends StatelessWidget {
 
     String currentRoute =
         GoRouter.of(context).routeInformationProvider.value.uri.toString();
-
-    // Tentukan label menu sesuai role
 
     // Ganti _navigationDrawerDestinations menjadi variabel lokal
     final List<_NavigationDestination> navigationDrawerDestinations =
