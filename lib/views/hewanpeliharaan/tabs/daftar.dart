@@ -4,6 +4,7 @@ import 'package:elaman_hati/api/authentication.dart';
 import 'package:elaman_hati/api/petownership.dart';
 import 'package:elaman_hati/models/pet.dart';
 import 'package:elaman_hati/widgets/animal_list_card.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
@@ -21,8 +22,9 @@ class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
 
   Future<void> _loadDaftar() async {
     var petFuture = PetOwnership().getList();
-    var typeFuture = PetOwnership().getAnimalsType();
     var user = await Authentication().getCurrentUser();
+    final String? role = GetStorage().read('USER_ROLE');
+    var typeFuture = PetOwnership().getAnimalsType(role!);
 
     setState(() {
       _listFuture = Future.wait([petFuture, typeFuture]);

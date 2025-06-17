@@ -153,24 +153,41 @@ class PetOwnership {
     }
   }
 
-  Future<Map<int, String>> getAnimalsType() async {
+  Future<Map<int, String>> getAnimalsType(String role) async {
     try {
       String token = await Authentication().getToken();
+      String type = role == 'peternak' ? 'farm' : 'pets';
+
       Response response = await _dio.get(
-        '${dotenv.env['API_HOST']}/type_of_animal',
+        '${dotenv.env['API_HOST']}/type_of_animal/$type',
         options: Options(
           headers: {
             HttpHeaders.authorizationHeader: "Bearer $token",
           },
+          // Tambahkan ini biar Dio tidak auto-cast jadi List
+          responseType: ResponseType.json,
         ),
       );
 
-      final List<dynamic> data = response.data;
-      return {
-        for (var item in data)
-          item['id'] as int: item['type_of_animal'] as String,
-      };
+      final responseData = response.data;
+      print('🔍 FULL response: $responseData');
+
+      if (responseData is Map && responseData.containsKey('data')) {
+        final List<dynamic> data = responseData['data'];
+
+        final result = {
+          for (var item in data)
+            item['id'] as int: item['type_of_animal'] as String,
+        };
+
+        print('✅ Parsed Animal Type: $result');
+        return result;
+      } else {
+        print('❌ Unexpected response format.');
+        return {};
+      }
     } catch (error) {
+      print('❌ Exception while loading animal types: $error');
       return Future.error(error);
     }
   }
