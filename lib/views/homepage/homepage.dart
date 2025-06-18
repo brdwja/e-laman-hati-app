@@ -1,12 +1,11 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:elaman_hati/api/animalstatistics.dart';
 import 'package:elaman_hati/api/authentication.dart';
-import 'package:elaman_hati/api/doctors_api.dart';
-import 'package:elaman_hati/models/doctor.dart';
-import 'package:elaman_hati/models/pagination.dart';
+import 'package:elaman_hati/api/news.dart';
+import 'package:elaman_hati/models/news.dart';
 import 'package:elaman_hati/models/statisticsdata.dart';
 import 'package:elaman_hati/models/user.dart';
+import 'package:flutter/foundation.dart';
+import '../news/news_detail.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/nav_drawer.dart';
@@ -22,6 +21,7 @@ class _HomepageState extends State<Homepage> {
   Future<User>? _futureUser;
   User? _user;
   Future<AnimalStatisticsModel>? _futureStatistics;
+  Future<List<News>>? _futureNews;
 
   Future<void> loadUser() async {
     debugPrint('loadUser DIPANGGIL');
@@ -48,9 +48,33 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  Future<void> loadNews() async {
+    var future = NewsApi().getNews();
+    setState(() {
+      _futureNews = future;
+    });
+    try {
+      await future;
+    } catch (error) {
+      _showSnackBar(
+        'Terjadi kesalahan saat memuat berita: $error. Mohon coba lagi.',
+      );
+    }
+  }
+
   Future<void> _refresh() async {
     await loadUser();
     await loadAnimalStatistics();
+    await loadNews();
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -62,7 +86,6 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    // Tambahkan debug print di sini
     debugPrint('ROLE USER: ${_user?.role}');
 
     return Scaffold(
@@ -80,19 +103,141 @@ class _HomepageState extends State<Homepage> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
-            WelcomeCard(
-              user: _user,
-            ),
+            WelcomeCard(user: _user),
             _user != null &&
                     (_user!.kecamatan != null && _user!.kecamatan != null)
-                ? const SizedBox(
-                    height: 20,
-                  )
+                ? const SizedBox(height: 20)
                 : const SizedBox(),
             (_user?.role != "admin")
                 ? SizedBox.shrink()
-                : AnimalStatistics(
-                    statistics: _futureStatistics,
+                : AnimalStatistics(statistics: _futureStatistics),
+            const SizedBox(height: 20),
+            const Text(
+              'BERITA',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            _futureNews == null
+                ? const SizedBox(
+                    height: 200,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : FutureBuilder<List<News>>(
+                    future: _futureNews,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            final news = snapshot.data![index];
+                            String truncatedContent = news.content.length > 90
+                                ? '${news.content.substring(0, 90)}...'
+                                : news.content;
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        NewsDetailPage(newsId: news.id),
+                                  ),
+                                );
+                              },
+                              child: Card(
+                                elevation: 1,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Image.network(
+                                        news.thumbnail,
+                                        width: 60,
+                                        height: 60,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Icon(
+                                          Icons.broken_image,
+                                          size: 60,
+                                          color: Colors.grey,
+                                        ),
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null)
+                                            return child;
+                                          return const CircularProgressIndicator();
+                                        },
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              news.title,
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              truncatedContent,
+                                              style:
+                                                  const TextStyle(fontSize: 14),
+                                            ),
+                                            Text(
+                                              '${news.createdAt.day} ${getMonthName(news.createdAt.month)} ${news.createdAt.year}',
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey),
+                                              textAlign: TextAlign.justify,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox(
+                          height: 200,
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      } else if (snapshot.hasError) {
+                        return SizedBox(
+                          height: 200,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text('Gagal memuat berita'),
+                                Text(
+                                  'Error: ${snapshot.error}',
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.red),
+                                  textAlign: TextAlign.center,
+                                ),
+                                ElevatedButton(
+                                  onPressed: _refresh,
+                                  child: const Text('Coba Lagi'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      } else {
+                        return const SizedBox(
+                          height: 200,
+                          child: Center(child: Text('Tidak ada berita')),
+                        );
+                      }
+                    },
                   ),
           ],
         ),
@@ -100,192 +245,23 @@ class _HomepageState extends State<Homepage> {
       endDrawer: NavDrawer(role: _user?.role),
     );
   }
-}
 
-class AnimalStatistics extends StatelessWidget {
-  const AnimalStatistics({
-    super.key,
-    required this.statistics,
-  });
-
-  final Future<AnimalStatisticsModel>? statistics;
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: statistics,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          debugPrint('FutureBuilder received Data!');
-          debugPrint(snapshot.data.toString());
-          final data = snapshot.data!;
-          return Column(
-            children: [
-              Card.filled(
-                clipBehavior: Clip.hardEdge,
-                color: Colors.white,
-                elevation: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text("Total Peliharaan Tercatat",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xff32325d))),
-                          RichText(
-                            text: TextSpan(
-                                style: const TextStyle(
-                                    fontSize: 16, color: Color(0xff32325d)),
-                                children: [
-                                  const TextSpan(text: "Steril: "),
-                                  TextSpan(
-                                      text: "${data.petOwnershipSterile}",
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  TextSpan(text: "/${data.petOwnershipTotal}"),
-                                ]),
-                          ),
-                          RichText(
-                            text: TextSpan(
-                                style: const TextStyle(
-                                    fontSize: 16, color: Color(0xff32325d)),
-                                children: [
-                                  const TextSpan(text: "Vaksin: "),
-                                  TextSpan(
-                                      text: "${data.petOwnershipVaccine}",
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  TextSpan(text: "/${data.petOwnershipTotal}"),
-                                ]),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      color: const Color(0xffb3b1b2),
-                      width: 100,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 32),
-                        child: Column(
-                          children: [
-                            Text("${data.petOwnershipTotal}",
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
-                            const Text('Ekor',
-                                style: TextStyle(color: Colors.white))
-                          ],
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              StatisticsCard(
-                title: "Total Hewan Tercatat",
-                vaksin: snapshot.data!.vaccineAnimal,
-                total: snapshot.data!.animal,
-              ),
-            ],
-          );
-        }
-        return const SizedBox(
-            height: 320, child: Center(child: CircularProgressIndicator()));
-      },
-    );
-  }
-}
-
-class StatisticsCard extends StatelessWidget {
-  const StatisticsCard({
-    super.key,
-    required this.title,
-    // required this.steril,
-    required this.vaksin,
-    required this.total,
-  });
-
-  final String title;
-  // final int steril;
-  final int vaksin;
-  final int total;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card.filled(
-      clipBehavior: Clip.hardEdge,
-      color: Colors.white,
-      elevation: 1,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xff32325d))),
-                // RichText(
-                //   text: TextSpan(
-                //     style: TextStyle(fontSize: 16, color: Color(0xff32325d)),
-                //     children: [
-                //       TextSpan(text: "Steril: "),
-                //       TextSpan(text: "$steril", style: TextStyle(fontWeight: FontWeight.bold)),
-                //       TextSpan(text: "/$total"),
-                //     ]
-                //   ),
-                // ),
-                RichText(
-                  text: TextSpan(
-                      style: const TextStyle(
-                          fontSize: 16, color: Color(0xff32325d)),
-                      children: [
-                        const TextSpan(text: "Vaksin: "),
-                        TextSpan(
-                            text: "$vaksin",
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        TextSpan(text: "/$total"),
-                      ]),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            color: const Color(0xffb3b1b2),
-            width: 100,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-              child: Column(
-                children: [
-                  Text("$total",
-                      style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white)),
-                  const Text('Ekor', style: TextStyle(color: Colors.white))
-                ],
-              ),
-            ),
-          )
-        ],
-      ),
-    );
+  String getMonthName(int month) {
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember'
+    ];
+    return months[month - 1];
   }
 }
 
@@ -384,185 +360,107 @@ class WelcomeCard extends StatelessWidget {
             ],
           ),
         ),
-        user != null && (user!.kecamatan != null && user!.kelurahan != null)
-            ? Positioned(
-                bottom: -20,
-                left: 20,
-                child: ElevatedButton(
-                  onPressed: () => showModalBottomSheet<void>(
-                    isScrollControlled: false,
-                    context: context,
-                    showDragHandle: true,
-                    builder: (context) {
-                      return DoctorsModalContents(
-                        user: user!,
-                      );
-                    },
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(0, 35),
-                    backgroundColor: const Color(0xffff6392),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text('Dokter Sekitar'),
-                ),
-              )
-            : const SizedBox(),
       ],
     );
   }
 }
 
-class DoctorsModalContents extends StatefulWidget {
-  const DoctorsModalContents({required this.user, super.key});
-  final User user;
+class AnimalStatistics extends StatelessWidget {
+  const AnimalStatistics({
+    super.key,
+    required this.statistics,
+  });
+
+  final Future<AnimalStatisticsModel>? statistics;
 
   @override
-  State<DoctorsModalContents> createState() => _DoctorsModalContentsState();
-}
-
-class _DoctorsModalContentsState extends State<DoctorsModalContents> {
-  Future<Paginated<List<Doctor>>>? _futureDoctors;
-  List<Doctor> doctors = [];
-
-  void loadDoctors(int page) async {
-    debugPrint(widget.user.kecamatan!.id.toString());
-    var future =
-        DoctorsAPI().getPaginatedDoctors(page, widget.user.kecamatan!.id);
-    setState(() {
-      _futureDoctors = future;
-    });
-    try {
-      var data = await future;
-      setState(() {
-        doctors.addAll(data.data);
-      });
-    } catch (error) {
-      //
-    }
-  }
-
-  void reloadDoctors() {
-    setState(() {
-      doctors.clear();
-    });
-    loadDoctors(1);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadDoctors(1);
-  }
-
-  Widget buildItem(IconData icon, String name, String content) {
-    return DefaultTextStyle.merge(
-      style: const TextStyle(color: Color(0xff172b4d)),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              icon,
-              size: 32,
-              color: const Color(0xff172b4d),
-            ),
-            Flexible(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: statistics,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          debugPrint('FutureBuilder received Data!');
+          debugPrint(snapshot.data.toString());
+          final data = snapshot.data!;
+          return Column(
+            children: [
+              Card.filled(
+                clipBehavior: Clip.hardEdge,
+                color: Colors.white,
+                elevation: 1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(name),
-                    Text(
-                      content,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.clip,
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("Total Peliharaan Tercatat",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff32325d))),
+                          RichText(
+                            text: TextSpan(
+                                style: const TextStyle(
+                                    fontSize: 16, color: Color(0xff32325d)),
+                                children: [
+                                  const TextSpan(text: "Steril: "),
+                                  TextSpan(
+                                      text: "${data.petOwnershipSterile}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  TextSpan(text: "/${data.petOwnershipTotal}"),
+                                ]),
+                          ),
+                          RichText(
+                            text: TextSpan(
+                                style: const TextStyle(
+                                    fontSize: 16, color: Color(0xff32325d)),
+                                children: [
+                                  const TextSpan(text: "Vaksin: "),
+                                  TextSpan(
+                                      text: "${data.petOwnershipVaccine}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  TextSpan(text: "/${data.petOwnershipTotal}"),
+                                ]),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      color: const Color(0xffb3b1b2),
+                      width: 100,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 32),
+                        child: Column(
+                          children: [
+                            Text("${data.petOwnershipTotal}",
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white)),
+                            const Text('Ekor',
+                                style: TextStyle(color: Colors.white))
+                          ],
+                        ),
+                      ),
                     )
                   ],
                 ),
               ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Daftar Dokter Sekitar',
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xff172b4d)),
-            ),
-            Text(
-                "${widget.user.kecamatan!.name}, ${widget.user.kelurahan!.name}"),
-            const SizedBox(
-              height: 8,
-            ),
-            Expanded(
-              child: FutureBuilder(
-                future: _futureDoctors,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (doctors.isEmpty) {
-                      return const Center(child: Text("Data tidak ditemukan"));
-                    }
-                    return ListView.builder(
-                      itemCount: doctors.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index < doctors.length) {
-                          return buildItem(Icons.medical_services,
-                              doctors[index].name, doctors[index].address);
-                        } else {
-                          if (snapshot.data!.currentPage <
-                              snapshot.data!.lastPage) {
-                            loadDoctors(snapshot.data!.currentPage + 1);
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else {
-                            return const SizedBox();
-                          }
-                        }
-                      },
-                    );
-                  } else if (snapshot.hasError) {
-                    return TextButton(
-                      onPressed: () => reloadDoctors(),
-                      child: const Text(
-                          'Terjadi Kesalahan, tekan untuk coba lagi.'),
-                    );
-                  }
-                  return const SizedBox(
-                    height: 240,
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                },
+              const SizedBox(
+                height: 8,
               ),
-            ),
-            const SizedBox(
-              height: 32,
-            ),
-          ],
-        ),
-      ),
+            ],
+          );
+        }
+        return const SizedBox(
+            height: 320, child: Center(child: CircularProgressIndicator()));
+      },
     );
   }
 }
