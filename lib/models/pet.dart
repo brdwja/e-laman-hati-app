@@ -41,11 +41,10 @@ class Pet {
       gender: json['gender'] ?? '-',
       date_of_birth: DateTime.tryParse(json['date_of_birth']) ?? DateTime.now(),
       age: DateTime.now(),
-      lastVaccine: (json['sterile_or_vaccine'] != null &&
-              json['sterile_or_vaccine'] != '')
-          ? DateTime.tryParse(json['sterile_or_vaccine'])
-          : null,
-      lastSterile: null,
+      lastSterile:
+          json['sterile'] != null ? DateTime.parse(json['sterile']) : null,
+      lastVaccine:
+          json['vaccine'] != null ? DateTime.parse(json['vaccine']) : null,
       image: json['image'] ?? '',
       is_dead: json['is_dead'] ?? false,
       id_chip: json['id_chip'] ?? '',
