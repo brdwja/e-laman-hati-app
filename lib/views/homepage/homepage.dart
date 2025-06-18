@@ -7,6 +7,7 @@ import 'package:elaman_hati/models/user.dart';
 import 'package:flutter/foundation.dart';
 import '../news/news_detail.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../widgets/nav_drawer.dart';
 
@@ -24,10 +25,8 @@ class _HomepageState extends State<Homepage> {
   Future<List<News>>? _futureNews;
 
   Future<void> loadUser() async {
-    debugPrint('loadUser DIPANGGIL');
     try {
       final user = await Authentication().getCurrentUser();
-      debugPrint('HASIL getCurrentUser: $user');
       setState(() {
         _user = user;
       });
@@ -87,7 +86,6 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     debugPrint('ROLE USER: ${_user?.role}');
-
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Color(0xffff6392)),
@@ -108,7 +106,7 @@ class _HomepageState extends State<Homepage> {
                     (_user!.kecamatan != null && _user!.kecamatan != null)
                 ? const SizedBox(height: 20)
                 : const SizedBox(),
-            (_user?.role != "admin")
+            (role != "admin")
                 ? SizedBox.shrink()
                 : AnimalStatistics(statistics: _futureStatistics),
             const SizedBox(height: 20),
@@ -242,7 +240,7 @@ class _HomepageState extends State<Homepage> {
           ],
         ),
       ),
-      endDrawer: NavDrawer(role: _user?.role),
+      endDrawer: NavDrawer(),
     );
   }
 

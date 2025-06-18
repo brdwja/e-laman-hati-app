@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter/gestures.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 
 import '../../api/authentication.dart';

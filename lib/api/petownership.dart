@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_brace_in_string_interps, curly_braces_in_flow_control_structures
+// ignore_for_file: unnecessary_brace_in_string_interps, curly_braces_in_flow_control_structures, avoid_print, non_constant_identifier_names
 
 import 'dart:io';
 
@@ -108,29 +108,38 @@ class PetOwnership {
     }
   }
 
-  Future<void> create(
-      XFile photo,
-      int genderId,
-      int petTypeId,
-      DateTime? lastSterile,
-      DateTime? lastVaccine,
-      DateTime age,
-      String name) async {
+  Future<void> addAnimal(
+    final String animal_name,
+    final int type_of_animal_id,
+    final String gender,
+    final DateTime date_of_birth,
+    final DateTime? sterile,
+    final DateTime? vaccine,
+    final XFile image,
+    final double? weight,
+  ) async {
     try {
       String token = await Authentication().getToken();
       debugPrint(token);
+
+      MultipartFile imageFile = await MultipartFile.fromFile(
+        image.path,
+        filename: image.name,
+      );
+
       FormData formData = FormData.fromMap({
-        'photo': await MultipartFile.fromFile(photo.path),
-        'gender_id': genderId,
-        'pet_type_id': petTypeId,
-        'name': name,
-        'last_sterile': lastSterile?.toIso8601String(),
-        'last_vaccine': lastVaccine?.toIso8601String(),
-        'age': age.toIso8601String(),
+        'animal_name': animal_name,
+        'type_of_animal_id': type_of_animal_id,
+        'gender': gender,
+        'date_of_birth': date_of_birth,
+        'sterile': sterile.toString().isNotEmpty ? sterile : null,
+        'vaccine': vaccine.toString().isNotEmpty ? vaccine : null,
+        'image': imageFile,
+        'weight': weight.toString().isNotEmpty ? weight : null,
       });
-      debugPrint("posting");
+
       Response response = await _dio.post(
-        '${dotenv.env['API_HOST']}/petownership',
+        '${dotenv.env['API_HOST']}/animals/addPet',
         data: formData,
         options: Options(
           headers: {
@@ -138,18 +147,56 @@ class PetOwnership {
           },
         ),
       );
-      debugPrint("posting done");
+
       var data = response.data as Map<String, dynamic>;
-      if (response.statusCode != 200 || data['status'] == false)
+      if (response.statusCode != 201 || data['status'] != 'success') {
         throw DioException(
-            requestOptions: response.requestOptions, response: response);
-    }
-    // on DioException catch (error) {
-    //   debugPrint(error.response?.data);
-    //   return Future.error('DE Terjadi kesalahan, coba lagi dalam beberapa saat');
-    // }
-    catch (error) {
+          requestOptions: response.requestOptions,
+          response: response,
+        );
+      }
+    } catch (error) {
+      if (error is DioException) {
+        final errorMessage =
+            error.response?.data['message'] ?? 'Terjadi kesalahan';
+        return Future.error(errorMessage);
+      }
       return Future.error('Terjadi kesalahan, coba lagi dalam beberapa saat');
+    }
+  }
+
+  Future<Map<int, String>> getAnimalsType(String role) async {
+    try {
+      String token = await Authentication().getToken();
+      String type = role == 'peternak' ? 'farm' : 'pets';
+
+      Response response = await _dio.get(
+        '${dotenv.env['API_HOST']}/type_of_animal/$type',
+        options: Options(
+          headers: {
+            HttpHeaders.authorizationHeader: "Bearer $token",
+          },
+          // Tambahkan ini biar Dio tidak auto-cast jadi List
+          responseType: ResponseType.json,
+        ),
+      );
+
+      final responseData = response.data;
+
+      if (responseData is Map && responseData.containsKey('data')) {
+        final List<dynamic> data = responseData['data'];
+
+        final result = {
+          for (var item in data)
+            item['id'] as int: item['type_of_animal'] as String,
+        };
+
+        return result;
+      } else {
+        return {};
+      }
+    } catch (error) {
+      return Future.error(error);
     }
   }
 
@@ -157,7 +204,7 @@ class PetOwnership {
     try {
       String token = await Authentication().getToken();
       Response response = await _dio.get(
-        '${dotenv.env['API_HOST']}/petownership/user',
+        '${dotenv.env['API_HOST']}/animals/show',
         options: Options(
           headers: {
             HttpHeaders.authorizationHeader: "Bearer $token",
@@ -172,7 +219,7 @@ class PetOwnership {
           (data['data'] as List<dynamic>).map((e) => Pet.fromJson(e)).toList();
       return list;
     } catch (error) {
-      return Future.error('Terjadi kesalahan, coba lagi dalam beberapa saat');
+      return Future.error(error);
     }
   }
 
@@ -180,7 +227,7 @@ class PetOwnership {
     try {
       String token = await Authentication().getToken();
       Response response = await _dio.delete(
-        '${dotenv.env['API_HOST']}/petownership?id=$id',
+        '${dotenv.env['API_HOST']}/animals/$id/delete',
         options: Options(
           headers: {
             HttpHeaders.authorizationHeader: "Bearer $token",
@@ -192,7 +239,7 @@ class PetOwnership {
         throw DioException(
             requestOptions: response.requestOptions, response: response);
     } catch (error) {
-      return Future.error('Terjadi kesalahan, coba lagi dalam beberapa saat');
+      return Future.error(error);
     }
   }
 
@@ -200,8 +247,8 @@ class PetOwnership {
     try {
       String token = await Authentication().getToken();
       Response response = await _dio.put(
-        // '${dotenv.env['API_HOST']}/petownership?id=$id',
-        "http://127.0.0.1:8000/api/animals/$id",
+        '${dotenv.env['API_HOST']}/animals/$id/mark-dead',
+        // "http://127.0.0.1:8000/api/animals/$id",
         data: {
           'is_dead': true,
           'dead_date': DateTime.now().toIso8601String(),

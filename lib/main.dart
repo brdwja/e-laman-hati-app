@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/services.dart';
@@ -16,10 +17,9 @@ import './api/authentication.dart';
 
 Future main() async {
   await dotenv.load(fileName: ".env");
+  await GetStorage.init();
   runApp(const MyApp());
 }
-
-
 
 /// The route configuration.
 final GoRouter _router = GoRouter(
@@ -74,45 +74,45 @@ final GoRouter _router = GoRouter(
         ),
       ],
       redirect: (BuildContext context, GoRouterState state) async {
-            // Using `of` method creates a dependency of StreamAuthScope. It will
-            // cause go_router to reparse current route if StreamAuth has new sign-in
-            // information.
-            final bool loggedIn = await Authentication().isLoggedIn();
-            
-            final List<String> unauthenticatedRoutes = ['/intro', '/login', '/register'];
-            final bool loggingIn = unauthenticatedRoutes.contains(state.fullPath);
+        // Using `of` method creates a dependency of StreamAuthScope. It will
+        // cause go_router to reparse current route if StreamAuth has new sign-in
+        // information.
+        final bool loggedIn = await Authentication().isLoggedIn();
 
-            if (loggingIn) {
-              SystemChrome.setPreferredOrientations([
-                  DeviceOrientation.portraitUp
-              ]);
-            } else {
-              SystemChrome.setPreferredOrientations([
-                DeviceOrientation.landscapeRight,
-                DeviceOrientation.landscapeLeft,
-                DeviceOrientation.portraitUp,
-                DeviceOrientation.portraitDown,
-              ]);
-            }
+        final List<String> unauthenticatedRoutes = [
+          '/intro',
+          '/login',
+          '/register'
+        ];
+        final bool loggingIn = unauthenticatedRoutes.contains(state.fullPath);
 
+        if (loggingIn) {
+          SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+        } else {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.landscapeRight,
+            DeviceOrientation.landscapeLeft,
+            DeviceOrientation.portraitUp,
+            DeviceOrientation.portraitDown,
+          ]);
+        }
 
-            // debugPrint("IS LOGGEDIN? $loggedIn $loggingIn ${state.fullPath}");
-            if (!loggedIn) {
-              if (loggingIn) return null;
-              return '/intro';
-            }
+        // debugPrint("IS LOGGEDIN? $loggedIn $loggingIn ${state.fullPath}");
+        if (!loggedIn) {
+          if (loggingIn) return null;
+          return '/intro';
+        }
 
-            // if the user is logged in but still on the login page, send them to
-            // the home page
-            if (loggingIn) {
-              return '/';
-            }
+        // if the user is logged in but still on the login page, send them to
+        // the home page
+        if (loggingIn) {
+          return '/';
+        }
 
-            // no need to redirect at all
-            return null;
-          },
+        // no need to redirect at all
+        return null;
+      },
     ),
-  
   ],
 );
 
