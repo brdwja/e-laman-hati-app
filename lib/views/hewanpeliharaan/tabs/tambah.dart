@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field, sort_child_properties_last, curly_braces_in_flow_control_structures
+// ignore_for_file: unused_field, sort_child_properties_last, curly_braces_in_flow_control_structures, use_build_context_synchronously
 
 import 'dart:io';
 
@@ -399,13 +399,13 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Berhasil menambahkan data!")),
                   );
-                  _formNameController.clear();
-                  _formDOBController.clear();
-                  _formSterileController.clear();
-                  _formVaccineController.clear();
-                  _formWeightController.clear();
-                  _genderFormController.clearDropDown();
-                  _petTypeFormController.clearDropDown();
+                  // _formNameController.clear();
+                  // _formDOBController.clear();
+                  // _formSterileController.clear();
+                  // _formVaccineController.clear();
+                  // _formWeightController.clear();
+                  // _genderFormController.clearDropDown();
+                  // _petTypeFormController.clearDropDown();
                   setState(() {
                     _imageFile = null;
                   });

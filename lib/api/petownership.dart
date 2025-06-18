@@ -148,8 +148,6 @@ class PetOwnership {
         ),
       );
 
-      debugPrint("posting done");
-      print(response.data);
       var data = response.data as Map<String, dynamic>;
       if (response.statusCode != 201 || data['status'] != 'success') {
         throw DioException(
