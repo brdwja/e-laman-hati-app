@@ -368,15 +368,15 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                 }
                 setState(() => submitDisabled = true);
                 try {
-                  debugPrint("requesting...");
-                  debugPrint(_formNameController.text);
-                  debugPrint(_selectedAnimalTypeId.toString());
-                  debugPrint(_selectedGender);
-                  debugPrint(_formDOBController.text);
-                  debugPrint(_formWeightController.text);
-                  debugPrint(_formSterileController.text);
-                  debugPrint(_formVaccineController.text);
-                  debugPrint('image: ${_imageFile?.name}');
+                  // debugPrint("requesting...");
+                  // debugPrint(_formNameController.text);
+                  // debugPrint(_selectedAnimalTypeId.toString());
+                  // debugPrint(_selectedGender);
+                  // debugPrint(_formDOBController.text);
+                  // debugPrint(_formWeightController.text);
+                  // debugPrint(_formSterileController.text);
+                  // debugPrint(_formVaccineController.text);
+                  // debugPrint('image: ${_imageFile?.name}');
 
                   final dateFormat = DateFormat('dd-MM-yyyy');
 
@@ -399,13 +399,13 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Berhasil menambahkan data!")),
                   );
-                  // _formNameController.clear();
-                  // _formDOBController.clear();
-                  // _formSterileController.clear();
-                  // _formVaccineController.clear();
-                  // _formWeightController.clear();
-                  // _genderFormController.clearDropDown();
-                  // _petTypeFormController.clearDropDown();
+                  _formNameController.clear();
+                  _formDOBController.clear();
+                  _formSterileController.clear();
+                  _formVaccineController.clear();
+                  _formWeightController.clear();
+                  _genderFormController.clearDropDown();
+                  _petTypeFormController.clearDropDown();
                   setState(() {
                     _imageFile = null;
                   });
