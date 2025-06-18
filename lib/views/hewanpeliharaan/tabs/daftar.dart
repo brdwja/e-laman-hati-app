@@ -4,6 +4,8 @@ import 'package:elaman_hati/api/authentication.dart';
 import 'package:elaman_hati/api/petownership.dart';
 import 'package:elaman_hati/models/pet.dart';
 import 'package:elaman_hati/widgets/animal_list_card.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
@@ -21,8 +23,9 @@ class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
 
   Future<void> _loadDaftar() async {
     var petFuture = PetOwnership().getList();
-    var typeFuture = PetOwnership().getAnimalsType();
     var user = await Authentication().getCurrentUser();
+    final String? role = GetStorage().read('USER_ROLE');
+    var typeFuture = PetOwnership().getAnimalsType(role!);
 
     setState(() {
       _listFuture = Future.wait([petFuture, typeFuture]);
@@ -107,6 +110,7 @@ class _DaftarHewanPeliharaanState extends State<DaftarHewanPeliharaan> {
                                     onRefresh: _loadDaftar,
                                     id: pet.id,
                                     age: pet.getAge(),
+                                    imagePath: pet.image,
                                   ),
                                 ),
                               );
@@ -184,15 +188,19 @@ class DaftarModalContents extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 child: AspectRatio(
                   aspectRatio: 1,
-                  child: Image.asset(
-                    "assets/images/random.png",
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const SizedBox(
-                      height: 200,
-                      child: Center(child: Icon(Icons.error)),
-                    ),
-                  ),
+                  child: daftarItem.image.isEmpty
+                      ? Image.asset(
+                          "assets/images/random.png",
+                          height: 120,
+                          width: 120,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.network(
+                          "${dotenv.env['MEDIA_HOST']}/storage/${daftarItem.image}",
+                          height: 120,
+                          width: 120,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
               const SizedBox(
