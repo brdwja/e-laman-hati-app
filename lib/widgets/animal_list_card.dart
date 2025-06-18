@@ -3,6 +3,7 @@
 import 'package:elaman_hati/api/petownership.dart';
 import 'package:elaman_hati/widgets/delete_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AnimalListCard extends StatelessWidget {
   final int id;
@@ -10,6 +11,7 @@ class AnimalListCard extends StatelessWidget {
   final String animal_name;
   final VoidCallback onRefresh;
   final String age;
+  final String imagePath;
   const AnimalListCard({
     super.key,
     required this.id,
@@ -17,6 +19,7 @@ class AnimalListCard extends StatelessWidget {
     required this.animal_name,
     required this.onRefresh,
     required this.age,
+    required this.imagePath,
   });
 
   @override
@@ -42,12 +45,19 @@ class AnimalListCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  "assets/images/random.png",
-                  height: 120,
-                  width: 120,
-                  fit: BoxFit.cover,
-                ),
+                child: imagePath.isEmpty
+                    ? Image.asset(
+                        "assets/images/random.png",
+                        height: 120,
+                        width: 120,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.network(
+                        "${dotenv.env['MEDIA_HOST']}/storage/$imagePath",
+                        height: 120,
+                        width: 120,
+                        fit: BoxFit.cover,
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(

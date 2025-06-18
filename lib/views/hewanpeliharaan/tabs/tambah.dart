@@ -3,7 +3,6 @@
 import 'dart:io';
 
 import 'package:elaman_hati/api/petownership.dart';
-import 'package:elaman_hati/models/idvalue.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -54,7 +53,6 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
   bool _sterileStatus = false;
   Future<Map<int, String>>? _animalTypeMap;
   int? _selectedAnimalTypeId;
-  IDValue? _selectedPetType;
   String? _selectedGender;
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _imageFile;
@@ -68,8 +66,6 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
 
   void _loadAnimalType(String role) async {
     try {
-      print('🟡 Memuat animal type untuk role: $role');
-
       final future = PetOwnership().getAnimalsType(role);
       final result = await future;
 
@@ -78,10 +74,8 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
       setState(() {
         _animalTypeMap = Future.value(result);
       });
-
-      print('✅ Animal types loaded: $result');
     } catch (e) {
-      print('❌ Failed to load animal types: $e');
+      //
     }
   }
 
@@ -258,58 +252,6 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
     );
   }
 
-  Widget _buildPetTypeDropdown() {
-    return FutureBuilder<Map<int, String>>(
-      future: _animalTypeMap,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return TextButton(
-            onPressed: () {
-              final role = GetStorage().read('role') ?? 'peternak';
-              _loadAnimalType(role);
-            },
-            child: const Text("Gagal memuat jenis hewan. Coba lagi."),
-          );
-        } else if (snapshot.hasData) {
-          final Map<int, String> typeMap = snapshot.data!;
-          final dropdownList = typeMap.entries
-              .map((e) => DropDownValueModel(value: e.key, name: e.value))
-              .toList();
-
-          return Material(
-            elevation: 2,
-            child: DropDownTextField(
-              controller: _petTypeFormController,
-              textFieldDecoration: formInputDecoration.copyWith(
-                prefixIcon: const Icon(Icons.pets),
-                label: const Text('Jenis Hewan'),
-              ),
-              clearOption: true,
-              enableSearch: true,
-              onChanged: (value) {
-                setState(() {
-                  if (value is! DropDownValueModel) {
-                    _selectedAnimalTypeId = null;
-                  } else {
-                    _selectedAnimalTypeId = value.value;
-                  }
-                });
-              },
-              validator: (_) => _selectedAnimalTypeId == null
-                  ? 'Mohon pilih jenis hewan'
-                  : null,
-              dropDownItemCount: dropdownList.length,
-              dropDownList: dropdownList,
-            ),
-          );
-        }
-        return const SizedBox.shrink();
-      },
-    );
-  }
-
   Widget _buildSterileSection() {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
@@ -427,8 +369,32 @@ class _TambahHewanPeliharaanState extends State<TambahHewanPeliharaan> {
                 setState(() => submitDisabled = true);
                 try {
                   debugPrint("requesting...");
-                  // await PetOwnership().create(...);
-                  debugPrint("done");
+                  debugPrint(_formNameController.text);
+                  debugPrint(_selectedAnimalTypeId.toString());
+                  debugPrint(_selectedGender);
+                  debugPrint(_formDOBController.text);
+                  debugPrint(_formWeightController.text);
+                  debugPrint(_formSterileController.text);
+                  debugPrint(_formVaccineController.text);
+                  debugPrint('image: ${_imageFile?.name}');
+
+                  final dateFormat = DateFormat('dd-MM-yyyy');
+
+                  await PetOwnership().addAnimal(
+                    _formNameController.text,
+                    _selectedAnimalTypeId!,
+                    _selectedGender!,
+                    dateFormat.parse(_formDOBController.text),
+                    _formSterileController.text.isNotEmpty
+                        ? dateFormat.parse(_formSterileController.text)
+                        : null,
+                    _formVaccineController.text.isNotEmpty
+                        ? dateFormat.parse(_formVaccineController.text)
+                        : null,
+                    _imageFile!,
+                    double.parse(_formWeightController.text),
+                  );
+
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Berhasil menambahkan data!")),
