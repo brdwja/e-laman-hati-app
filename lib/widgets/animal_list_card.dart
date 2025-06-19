@@ -53,7 +53,7 @@ class AnimalListCard extends StatelessWidget {
                         fit: BoxFit.cover,
                       )
                     : Image.network(
-                        "${dotenv.env['MEDIA_HOST']}/storage/$imagePath",
+                        "${dotenv.env['MEDIA_HOST']}/$imagePath",
                         height: 120,
                         width: 120,
                         fit: BoxFit.cover,

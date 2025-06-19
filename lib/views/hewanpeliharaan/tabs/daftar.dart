@@ -4,6 +4,7 @@ import 'package:elaman_hati/api/authentication.dart';
 import 'package:elaman_hati/api/petownership.dart';
 import 'package:elaman_hati/models/pet.dart';
 import 'package:elaman_hati/widgets/animal_list_card.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -195,7 +196,7 @@ class DaftarModalContents extends StatelessWidget {
                           fit: BoxFit.cover,
                         )
                       : Image.network(
-                          getFullImageUrl(daftarItem.image),
+                          '${dotenv.env['MEDIA_HOST']}/${daftarItem.image}',
                           height: 120,
                           width: 120,
                           fit: BoxFit.cover,
@@ -260,14 +261,6 @@ class DaftarModalContents extends StatelessWidget {
       ),
     );
   }
-}
-
-String getFullImageUrl(String relativePath) {
-  if (relativePath.startsWith("images/")) {
-    return "https://laman-hati.teluapp.org/storage/" +
-        relativePath.replaceFirst("images/", "");
-  }
-  return "https://laman-hati.teluapp.org/" + relativePath;
 }
 
 // Positioned(
