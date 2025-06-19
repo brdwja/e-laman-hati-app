@@ -44,3 +44,7 @@ app.*.map.json
 /android/app/release
 
 .vscode/templates
+
+android/key.properties
+android/app/e_laman_hati_key.jks
+
