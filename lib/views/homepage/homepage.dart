@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field, unnecessary_import, curly_braces_in_flow_control_structures
+
 import 'package:elaman_hati/api/animalstatistics.dart';
 import 'package:elaman_hati/api/authentication.dart';
 import 'package:elaman_hati/api/news.dart';
