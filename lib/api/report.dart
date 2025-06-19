@@ -110,8 +110,7 @@ class ReportAnimal {
     try {
       String token = await Authentication().getToken();
       Response response = await _dio.put(
-        // '${dotenv.env['API_HOST']}/petownership?id=$id',
-        "http://127.0.0.1:8000/api/animals/$id",
+        '${dotenv.env['API_HOST']}/animals/$id',
         data: {
           'is_dead': true,
           'dead_date': DateTime.now().toIso8601String(),
