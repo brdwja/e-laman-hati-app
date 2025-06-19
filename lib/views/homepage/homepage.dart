@@ -85,7 +85,7 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('ROLE USER: ${_user?.role}');
+    final String? role = GetStorage().read('USER_ROLE');
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Color(0xffff6392)),
