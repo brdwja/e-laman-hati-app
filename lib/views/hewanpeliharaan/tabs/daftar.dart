@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings
 
 import 'package:elaman_hati/api/authentication.dart';
 import 'package:elaman_hati/api/petownership.dart';
@@ -196,10 +196,18 @@ class DaftarModalContents extends StatelessWidget {
                           fit: BoxFit.cover,
                         )
                       : Image.network(
-                          "${dotenv.env['MEDIA_HOST']}/storage/${daftarItem.image}",
+                          getFullImageUrl(daftarItem.image),
                           height: 120,
                           width: 120,
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              "assets/images/cat1.png",
+                              height: 120,
+                              width: 120,
+                              fit: BoxFit.cover,
+                            );
+                          },
                         ),
                 ),
               ),
@@ -253,6 +261,14 @@ class DaftarModalContents extends StatelessWidget {
       ),
     );
   }
+}
+
+String getFullImageUrl(String relativePath) {
+  if (relativePath.startsWith("images/")) {
+    return "https://laman-hati.teluapp.org/storage/" +
+        relativePath.replaceFirst("images/", "");
+  }
+  return "https://laman-hati.teluapp.org/" + relativePath;
 }
 
 // Positioned(

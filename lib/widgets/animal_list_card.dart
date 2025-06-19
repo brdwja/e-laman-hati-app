@@ -57,6 +57,14 @@ class AnimalListCard extends StatelessWidget {
                         height: 120,
                         width: 120,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            "assets/images/cat1.png",
+                            height: 120,
+                            width: 120,
+                            fit: BoxFit.cover,
+                          );
+                        },
                       ),
               ),
               const SizedBox(width: 12),
