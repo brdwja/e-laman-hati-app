@@ -28,27 +28,19 @@ class DinaHTService {
     );
   }
 
-  Future<RFIDAnimal> fetchByChip(String chipId) async {
-    try {
-      final response = await _dio.get(
-        '${dotenv.env['API_HOST']}/dina-ht/show-by-chip/$chipId',
-      );
+Future<RFIDAnimal> get(String rfid) async {
+  try {
+    final response = await _dio.get(
+      'http://127.0.0.1:8000/api/dina-ht/show-by-chip/$rfid',
+    );
 
-      print(chipId);
-      final data = response.data as Map<String, dynamic>;
-
-      if (response.statusCode != 200 || data['status'] == false) {
-        throw DioException(
-          requestOptions: response.requestOptions,
-          response: response,
-        );
-      }
-
-      return RFIDAnimal.fromJson(data['data']);
-    } on DioException catch (err) {
-      return Future.error("ID Chip tidak ditemukan.");
-    } catch (err) {
-      return Future.error("Terjadi kesalahan.");
+    if (response.statusCode != 200) {
+      throw Exception("Id Chip Tidak Ditemukan");
     }
+
+    return RFIDAnimal.fromJson(response.data);
+  } catch (e) {
+    throw Exception("Gagal mengambil data");
   }
+}
 }
