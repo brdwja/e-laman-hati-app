@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors_in_immutables
 
 import 'package:elaman_hati/api/dinahate_rfidanimal.dart';
+import 'package:elaman_hati/api/dinaht_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:elaman_hati/models/rfidanimal.dart';
 import 'package:intl/intl.dart';
@@ -146,36 +147,44 @@ class _RFIDCardState extends State<RFIDCard> {
             bottom: -20,
             left: 20,
             child: ElevatedButton(
-              onPressed: _buttonDisabled ? null : () async {
-                if (!_formKey.currentState!.validate()) return;
-                try {
-                  setState(() {
-                    _buttonDisabled = true;
-                  });
-                  final animalData = await DinaHateRFIDAnimalAPI().get(_rfidTextController.text);
-                  debugPrint(animalData.toString());
-                  if (!context.mounted) return;
-                  showModalBottomSheet<void>(
-                    isScrollControlled: false,
-                    context: context,
-                    showDragHandle: true,
-                    builder: (context) {
-                      return RFIDAnimalContents(animal: animalData,);
-                    },
-                  );
-                } catch (err) {
-                  ScaffoldMessenger
-                    .of(context)
-                    .showSnackBar(
-                      SnackBar(
-                        content: Text(err.toString()),
-                      ),
-                    );
-                } finally {
-                  setState(() {
-                    _buttonDisabled = false;
-                  });
-                }
+onPressed: _buttonDisabled ? null : () async {
+  if (!_formKey.currentState!.validate()) return;
+
+  try {
+    setState(() {
+      _buttonDisabled = true;
+    });
+
+    // Panggil API untuk ambil data hewan berdasarkan ID chip
+    final animalData = await DinaHTService().fetchByChip(_rfidTextController.text);
+
+    debugPrint(animalData.toString());
+
+    if (!context.mounted) return;
+
+    // Tampilkan data di bottom sheet
+    showModalBottomSheet<void>(
+      isScrollControlled: false,
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return RFIDAnimalContents(animal: animalData);
+      },
+    );
+  } catch (err) {
+    // Tampilkan error jika ID chip tidak ditemukan atau API gagal
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(err.toString()),
+        backgroundColor: Colors.red,
+      ),
+    );
+  } finally {
+    setState(() {
+      _buttonDisabled = false;
+    });
+  }
+
                 
               },
               style: ElevatedButton.styleFrom(

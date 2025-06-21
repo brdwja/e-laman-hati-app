@@ -21,6 +21,7 @@ Future main() async {
   runApp(const MyApp());
 }
 
+
 /// The route configuration.
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
@@ -133,3 +134,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
